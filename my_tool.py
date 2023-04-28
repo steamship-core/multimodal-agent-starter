@@ -21,7 +21,7 @@ Come up with a todo list for this objective: {objective}"
 
 
 class MyTool(Tool):
-    """Tool used to schedule reminders via the Steamship Task system."""
+    """Tool used to manage to-do lists."""
 
     chain: LLMChain
 
@@ -39,5 +39,4 @@ class MyTool(Tool):
 
     def run(self, prompt: str, **kwargs) -> str:
         """Respond to LLM prompts."""
-        logging.info("Your tool is being called! ")
         return self.chain.predict(objective=prompt)

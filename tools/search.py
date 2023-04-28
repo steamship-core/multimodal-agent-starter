@@ -12,7 +12,7 @@ Useful for when you need to answer questions about current events
 
 
 class SearchTool(Tool):
-    """Tool used to schedule reminders via the Steamship Task system."""
+    """Tool used to search for information using SERP API."""
 
     search: SteamshipSERP
 
