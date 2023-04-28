@@ -9,7 +9,6 @@ from steamship.invocable import PackageService
 from steamship_langchain import OpenAI
 
 from src.parser import (
-    FORMAT_INSTRUCTIONS_W_TOOLS,
     CustomParser,
     get_format_instructions,
 )

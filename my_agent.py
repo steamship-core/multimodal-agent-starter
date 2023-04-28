@@ -1,8 +1,9 @@
 from typing import List
 
 from langchain.agents import Tool
-
 from src.agent import Agent
+# noinspection PyUnresolvedReferences
+from tools import SearchTool, MyTool, GenerateImageTool
 
 TEMPERATURE = 0.7
 MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
