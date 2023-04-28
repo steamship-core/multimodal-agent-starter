@@ -16,7 +16,7 @@ Action Input: the input to the action
 Observation: the result of the action
 ... (this Thought/Action/Action Input/Observation can repeat N times)
 Thought: I now know the final answer
-Final Answer: the final answer to the original input question
+Final Answer: the final answer to the original input question. Consider all observations to come up with a final answer.
 """
 
 FORMAT_INSTRUCTIONS_WO_TOOLS = """
@@ -36,6 +36,10 @@ def get_format_instructions(has_tools=True) -> str:
 
 
 class CustomParser(AgentOutputParser):
+    @property
+    def _type(self) -> str:
+        return ""
+
     def get_format_instructions(self) -> str:
         return get_format_instructions(True)
 
@@ -46,6 +50,8 @@ class CustomParser(AgentOutputParser):
                 r"([0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12})",
                 output,
             )
+
+            output = [re.sub(r"^[^\w]+", "", el) for el in output]
 
             return AgentFinish({"output": output}, text)
         # \s matches against tab/newline/whitespace

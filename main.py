@@ -1,7 +1,7 @@
 from steamship import Steamship
 
-from my_agent import MyAgent
-from src.utils import show_result
+from api import MyAgent
+from utils import show_result
 from tools import MyTool
 from termcolor import colored
 
@@ -10,7 +10,7 @@ if __name__ == "__main__":
         agent = MyAgent(client)
         if agent.is_ready():
             message = input(colored("Input: ", "grey"))
-            results = agent.run(message)
+            results = agent.respond(message)
             for result in results:
                 show_result(client, result)
         else:
