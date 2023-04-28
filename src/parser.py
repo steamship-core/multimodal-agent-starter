@@ -6,7 +6,7 @@ from langchain.schema import AgentAction, AgentFinish, OutputParserException
 
 FINAL_ANSWER_ACTION = "Final Answer:"
 
-FORMAT_INSTRUCTIONS = """
+FORMAT_INSTRUCTIONS_W_TOOLS = """
 Use the following format:
 
 Question: the input question you must answer
@@ -19,10 +19,25 @@ Thought: I now know the final answer
 Final Answer: the final answer to the original input question
 """
 
+FORMAT_INSTRUCTIONS_WO_TOOLS = """
+Use the following format:
+
+Question: the input question you must answer
+Thought: I now know the final answer
+Final Answer: the final answer to the original input question
+"""
+
+
+def get_format_instructions(has_tools=True) -> str:
+    if has_tools:
+        return FORMAT_INSTRUCTIONS_W_TOOLS
+    else:
+        return FORMAT_INSTRUCTIONS_WO_TOOLS
+
 
 class CustomParser(AgentOutputParser):
     def get_format_instructions(self) -> str:
-        return FORMAT_INSTRUCTIONS
+        return get_format_instructions(True)
 
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
         if FINAL_ANSWER_ACTION in text:

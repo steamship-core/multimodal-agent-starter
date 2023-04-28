@@ -3,8 +3,10 @@ from typing import List
 from langchain.agents import Tool
 from steamship import Steamship
 
+from my_tool import MyTool
 from src.agent import Agent
 from src.utils import show_result
+from tools import SearchTool, GenerateImageTool
 
 TEMPERATURE = 0.7
 MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
@@ -13,7 +15,7 @@ VERBOSE = True
 
 class MyAgent(Agent):
     def is_ready(self):
-        return False
+        return True
 
     def get_tools(self) -> List[Tool]:
         return [

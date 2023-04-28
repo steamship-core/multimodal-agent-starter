@@ -8,7 +8,7 @@ from langchain.agents import Tool
 from steamship.invocable import PackageService
 from steamship_langchain import OpenAI
 
-from src.parser import FORMAT_INSTRUCTIONS, CustomParser
+from src.parser import FORMAT_INSTRUCTIONS_W_TOOLS, CustomParser, get_format_instructions
 
 TEMPERATURE = 0.7
 MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
@@ -30,14 +30,14 @@ class Agent(PackageService, ABC):
     {agent_scratchpad}"""
         return ZeroShotAgent.create_prompt(
             tools,
-            format_instructions=FORMAT_INSTRUCTIONS,
+            format_instructions=get_format_instructions(bool(tools)),
             prefix=prefix,
             suffix=suffix,
             input_variables=["question", "agent_scratchpad"],
         )
 
     def get_agent(self):
-        llm = OpenAI(client=client, temperature=0)
+        llm = OpenAI(client=self.client, temperature=0)
 
         tools = self.get_tools()
         prompt = self.get_prompt(tools)
