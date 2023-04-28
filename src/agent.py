@@ -8,7 +8,11 @@ from langchain.agents import Tool
 from steamship.invocable import PackageService
 from steamship_langchain import OpenAI
 
-from src.parser import FORMAT_INSTRUCTIONS_W_TOOLS, CustomParser, get_format_instructions
+from src.parser import (
+    FORMAT_INSTRUCTIONS_W_TOOLS,
+    CustomParser,
+    get_format_instructions,
+)
 
 TEMPERATURE = 0.7
 MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"

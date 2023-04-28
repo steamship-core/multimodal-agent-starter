@@ -41,10 +41,3 @@ class MyTool(Tool):
         """Respond to LLM prompts."""
         logging.info("Your tool is being called! ")
         return self.chain.predict(objective=prompt)
-
-
-if __name__ == "__main__":
-    with Steamship.temporary_workspace() as client:
-        my_tool = MyTool(client)
-        result = my_tool.run("Find a hotel in Boston")
-        print(result)
