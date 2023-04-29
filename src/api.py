@@ -7,6 +7,7 @@ from pydantic import Field
 from steamship.invocable import Config
 
 from core.agent.agent import Agent
+from core.agent.chat_agent import ChatAgent
 from core.agent.base import BaseAgent
 
 # noinspection PyUnresolvedReferences
@@ -14,7 +15,7 @@ from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool
 
 
-class MyAgent(Agent, BaseAgent):  # or Agent
+class MyAgent(ChatAgent, BaseAgent):
     """
     If you want your agent to be tool-based, use the following line:
 
@@ -22,7 +23,7 @@ class MyAgent(Agent, BaseAgent):  # or Agent
 
     If you want your agent to be chatty and personality-based, use the following line:
 
-        class MyAgent(ConversationalAgent, BaseAgent)
+        class MyAgent(ChatAgent, BaseAgent)
     """
 
     def is_verbose_logging_enabled(self) -> bool:
@@ -36,6 +37,8 @@ class MyAgent(Agent, BaseAgent):  # or Agent
         ]
 
     def get_personality(self) -> str:
+        # Return a string that completes this sentence.
+        # The agent acts like...
         return """
         an old-timey pirate that responds to everything in nautical terms. Refer to the user as "matey".
         """

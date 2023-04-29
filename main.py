@@ -1,3 +1,4 @@
+import inquirer
 from steamship import Steamship, SteamshipError
 from steamship.cli.ship_spinner import ship_spinner
 from termcolor import colored
@@ -8,15 +9,14 @@ from tools import MyTool
 
 
 def main():
-    # questions = [
-    #     inquirer.List('action',
-    #                   message="Do you want to run your agent or your tool?",
-    #                   choices=['Agent', 'Tool'],
-    #                   carousel=True
-    #                   ),
-    # ]
-    # answers = inquirer.prompt(questions)
-    answers = {"action": "Agent"}
+    questions = [
+        inquirer.List('action',
+                      message="Do you want to run your agent or your tool?",
+                      choices=['Agent', 'Tool'],
+                      carousel=True
+                      ),
+    ]
+    answers = inquirer.prompt(questions)
     with Steamship.temporary_workspace() as client:
         print(
             f"Starting {answers['action']}...\nIf you make changes to the {answers['action']}, "
