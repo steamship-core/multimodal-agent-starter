@@ -11,7 +11,7 @@ from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool
 
 
-class MyAgent(Agent, BaseAgent):  # or Agent
+class MyAgent(ChatAgent, BaseAgent):  # or Agent
     def is_verbose_logging_enabled(self) -> bool:
         return True
 

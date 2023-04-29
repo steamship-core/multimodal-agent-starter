@@ -1,5 +1,6 @@
 import abc
 import logging
+import re
 from abc import ABC
 from typing import List, Optional, Dict, Any, Type, Union
 from pydantic import Field
@@ -10,7 +11,7 @@ from steamship.experimental.transports.chat import ChatMessage
 from steamship.invocable import PackageService, post, Config
 from core.comms import CommsChannels
 
-from utils import is_valid_uuid
+from utils import is_valid_uuid, UUID_PATTERN
 
 
 def response_for_exception(e: Optional[Exception]) -> str:

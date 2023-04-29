@@ -25,10 +25,7 @@ class GenerateImageTool(Tool):
 
     def __init__(self, client: Steamship):
         super().__init__(
-            name=NAME,
-            func=self.run,
-            description=DESCRIPTION,
-            client=client
+            name=NAME, func=self.run, description=DESCRIPTION, client=client
         )
 
     @property
