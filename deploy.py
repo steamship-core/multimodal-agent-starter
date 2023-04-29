@@ -15,7 +15,7 @@ bot = client.use(
     package_handle=manifest.handle,
     version=manifest.version,
     instance_handle=f"{manifest.handle}-{manifest.version.replace('.', '-')}",
-    config={}
+    config={},
 )
 
 bot.wait_for_init()

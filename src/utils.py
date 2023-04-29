@@ -7,7 +7,9 @@ from steamship.data.workspace import SignedUrl
 from steamship.utils.signed_urls import upload_to_signed_url
 from termcolor import colored
 
-UUID_PATTERN = re.compile(r"([0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12})")
+UUID_PATTERN = re.compile(
+    r"([0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12})"
+)
 
 
 def is_valid_uuid(uuid_to_test: str, version=4) -> bool:

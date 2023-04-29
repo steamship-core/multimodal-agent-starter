@@ -18,8 +18,10 @@ def main():
     # answers = inquirer.prompt(questions)
     answers = {"action": "Agent"}
     with Steamship.temporary_workspace() as client:
-        print(f"Starting {answers['action']}...\nIf you make changes to the {answers['action']}, "
-              f"you will need to restart this client. Press CTRL+C to exit at any time.\n")
+        print(
+            f"Starting {answers['action']}...\nIf you make changes to the {answers['action']}, "
+            f"you will need to restart this client. Press CTRL+C to exit at any time.\n"
+        )
 
         count = 1
         while True:
@@ -36,7 +38,9 @@ def get_results(client: Steamship, action: str, prompt: str):
         return tool.run(prompt=prompt)
     else:
         agent = MyAgent(client=client)
-        if not agent.is_verbose_logging_enabled():  # display progress when verbose is False
+        if (
+            not agent.is_verbose_logging_enabled()
+        ):  # display progress when verbose is False
             print("Running: ", end="")
             with ship_spinner():
                 return agent.run(prompt=prompt)

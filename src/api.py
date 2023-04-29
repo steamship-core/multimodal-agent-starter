@@ -4,11 +4,14 @@ from langchain.agents import Tool
 
 # noinspection PyUnresolvedReferences
 from core.agent.agent import Agent
+from core.agent.base import BaseAgent
+
+# noinspection PyUnresolvedReferences
+from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool
 
 
-class MyAgent(Agent):  # or Agent
-
+class MyAgent(Agent, BaseAgent):  # or Agent
     def is_verbose_logging_enabled(self) -> bool:
         return True
 

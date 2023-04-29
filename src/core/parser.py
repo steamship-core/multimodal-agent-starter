@@ -36,7 +36,6 @@ def get_format_instructions(has_tools=True) -> str:
 
 
 class CustomParser(MRKLOutputParser):
-
     def get_format_instructions(self) -> str:
         return get_format_instructions(True)
 
