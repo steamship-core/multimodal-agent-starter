@@ -50,7 +50,7 @@ class ConversationalChatAgentWithPersonality(ConversationalChatAgent):
         self, intermediate_steps: List[Tuple[AgentAction, str]]
     ) -> List[BaseMessage]:
         """Construct the scratchpad that lets the agent continue its thought process.
-        
+
         NOTE: This is copied out of LangChain because  LangChain does not allow modification of the
         TEMPLATE_TOOL_RESPONSE variable, which hard-codes in the requirement to not inflect the tool
         output with any particular personality.
@@ -59,11 +59,13 @@ class ConversationalChatAgentWithPersonality(ConversationalChatAgent):
         for action, observation in intermediate_steps:
             thoughts.append(AIMessage(content=action.log))
             human_message = HumanMessage(
-                content=TEMPLATE_TOOL_RESPONSE.format(observation=observation, personality=self.personality)
+                content=TEMPLATE_TOOL_RESPONSE.format(
+                    observation=observation, personality=self.personality
+                )
             )
             thoughts.append(human_message)
         return thoughts
-    
+
 
 class ChatAgent(BaseAgent):
     name: str = "MyAgent"
@@ -73,9 +75,7 @@ class ChatAgent(BaseAgent):
             client=self.client, temperature=TEMPERATURE, model_name=MODEL_NAME
         )
 
-        sys_message = PREFIX.format(
-            personality=self.get_personality()
-        )
+        sys_message = PREFIX.format(personality=self.get_personality())
 
         tools = self.get_tools()
         memory = ConversationBufferWindowMemory(
@@ -84,7 +84,11 @@ class ChatAgent(BaseAgent):
         )
 
         agent = ConversationalChatAgentWithPersonality.from_llm_and_tools(
-            llm, tools, personality=self.get_personality(), system_message=sys_message, output_parser=ChatCustomParser()
+            llm,
+            tools,
+            personality=self.get_personality(),
+            system_message=sys_message,
+            output_parser=ChatCustomParser(),
         )
         return AgentExecutor.from_agent_and_tools(
             agent=agent,

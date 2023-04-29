@@ -23,12 +23,6 @@ class ChatCustomParser(ConvoOutputParser):
                     output,
                 )
                 output = [re.sub(r"^\W+", "", el) for el in output]
-                return {
-                    "action": "Final Answer",
-                    "action_input": output[0]
-                }
+                return {"action": "Final Answer", "action_input": output[0]}
             except Exception as e:
-                return {
-                    "action": "Final Answer",
-                    "action_input": cleaned_output
-                }
+                return {"action": "Final Answer", "action_input": cleaned_output}

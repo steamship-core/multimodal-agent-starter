@@ -101,7 +101,7 @@ class BaseAgent(PackageService, ABC):
         return self.comms.telegram_info()
 
     def chain_output_to_chat_messages(
-            self, inbound_message: ChatMessage, chain_output: Union[str, List[str]]
+        self, inbound_message: ChatMessage, chain_output: Union[str, List[str]]
     ) -> List[ChatMessage]:
         """Transform the output of the Tool/Chain into a list of ChatMessage objects..
         A tool/chain returns a string or list of strings. The string contents contains a sneak-route for mime encoding:
@@ -112,7 +112,7 @@ class BaseAgent(PackageService, ABC):
         """
         ret = []
         for part_response in (
-                chain_output if isinstance(chain_output, list) else [chain_output]
+            chain_output if isinstance(chain_output, list) else [chain_output]
         ):
             if is_valid_uuid(part_response):
                 # It's a block containing binary data.

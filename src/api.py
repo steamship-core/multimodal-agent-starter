@@ -1,10 +1,12 @@
 from typing import List
 
 from langchain.agents import Tool
+
 # noinspection PyUnresolvedReferences
 from pydantic import Field
 
 from core.agent.base import BaseAgent
+
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool
