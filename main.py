@@ -1,4 +1,3 @@
-import inquirer
 from steamship import Steamship, SteamshipError
 from steamship.cli.ship_spinner import ship_spinner
 from termcolor import colored
@@ -9,35 +8,57 @@ from tools import MyTool
 
 
 def main():
-    questions = [
-        inquirer.List('action',
-                      message="Do you want to run your agent or your tool?",
-                      choices=['Agent', 'Tool'],
-                      carousel=True
-                      ),
-    ]
-    answers = inquirer.prompt(questions)
+    # questions = [
+    #     inquirer.List('action',
+    #                   message="Do you want to run your agent or your tool?",
+    #                   choices=['Agent', 'Tool'],
+    #                   carousel=True
+    #                   ),
+    # ]
+    # answers = inquirer.prompt(questions)
+    answers = {"action": "Agent"}
+    is_tool = answers["action"] == "Tool"
+
     with Steamship.temporary_workspace() as client:
+        if is_tool:
+            tool = MyTool(client=client)
+            print(f"Starting {answers['action']} {tool.name}...")
+        else:
+            print(f"Starting {answers['action']}...")
+
         print(
-            f"Starting {answers['action']}...\nIf you make changes to the {answers['action']}, "
-            f"you will need to restart this client. Press CTRL+C to exit at any time.\n"
+            f"If you make code changes, you will need to restart this client. Press CTRL+C to exit at any time.\n"
         )
 
         count = 1
+
+        debug_web_endpoint_via_localhost = False
+
         while True:
-            print(f"----- Agent Run {count} -----")
+            print(f"----- {answers['action']} Run {count} -----")
             prompt = input(colored(f"Prompt: ", "blue"))
-            results = get_results(client, answers["action"], prompt)
+            results = get_results(
+                client,
+                answers["action"],
+                prompt,
+                as_api=debug_web_endpoint_via_localhost,
+            )
             show_results(client, results)
             count += 1
 
 
-def get_results(client: Steamship, action: str, prompt: str):
+def get_results(client: Steamship, action: str, prompt: str, as_api: bool = False):
     if action == "Tool":
         tool = MyTool(client=client)
         return tool.run(prompt=prompt)
     else:
         agent = MyAgent(client=client)
+
+        # For Debugging
+        if as_api:
+            resp = agent.answer(question=prompt)
+            return resp
+
         if (
             not agent.is_verbose_logging_enabled()
         ):  # display progress when verbose is False

@@ -7,6 +7,7 @@ from steamship.experimental.transports.chat import ChatMessage
 from steamship.experimental.transports.steamship_widget import SteamshipWidgetTransport
 import logging
 
+
 class CommsChannels:
     """
     Intended usage:
@@ -23,6 +24,7 @@ class CommsChannels:
        return outbound_messages
 
     """
+
     client: Steamship
     telegram_token: Optional[str]
 
@@ -76,10 +78,12 @@ class CommsChannels:
         if not kwargs or "question" not in kwargs:
             return None
 
-        return self.web_transport.parse_inbound(payload={
-            "question": kwargs.get("question"),
-            "chat_session_id": kwargs.get("chat_session_id")
-        })
+        return self.web_transport.parse_inbound(
+            payload={
+                "question": kwargs.get("question"),
+                "chat_session_id": kwargs.get("chat_session_id"),
+            }
+        )
 
     def telegram_send(self, messages: List[ChatMessage]) -> List[dict]:
         """Send a list of responses to the Telegram user."""

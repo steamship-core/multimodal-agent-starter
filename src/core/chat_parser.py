@@ -1,9 +1,6 @@
 import re
 from typing import Any
 
-from langchain.agents.conversational_chat.base import (
-    AgentOutputParser as BaseChatAgentOutputParser,
-)
 from langchain.agents.conversational_chat.output_parser import ConvoOutputParser
 
 

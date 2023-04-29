@@ -1,15 +1,10 @@
-from typing import List, Optional, Type
+from typing import List
 
 from langchain.agents import Tool
-
 # noinspection PyUnresolvedReferences
 from pydantic import Field
-from steamship.invocable import Config
 
-from core.agent.agent import Agent
-from core.agent.chat_agent import ChatAgent
 from core.agent.base import BaseAgent
-
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool
@@ -42,4 +37,3 @@ class MyAgent(ChatAgent, BaseAgent):
         return """
         an old-timey pirate that responds to everything in nautical terms. Refer to the user as "matey".
         """
-
