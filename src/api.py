@@ -15,6 +15,15 @@ from tools import SearchTool, GenerateImageTool
 
 
 class MyAgent(Agent, BaseAgent):  # or Agent
+    """
+    If you want your agent to be tool-based, use the following line:
+
+        class MyAgent(Agent, BaseAgent)
+
+    If you want your agent to be chatty and personality-based, use the following line:
+
+        class MyAgent(ConversationalAgent, BaseAgent)
+    """
 
     def is_verbose_logging_enabled(self) -> bool:
         return True
@@ -31,6 +40,3 @@ class MyAgent(Agent, BaseAgent):  # or Agent
         an old-timey pirate that responds to everything in nautical terms. Refer to the user as "matey".
         """
 
-    # You can ignore the methods below.
-
-    config: MyAgentConfig
