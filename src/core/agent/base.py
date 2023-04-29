@@ -2,7 +2,7 @@ import abc
 import re
 from abc import ABC
 from typing import List, Optional, Dict, Any, Type, Union
-
+import logging
 from langchain.agents import Tool
 from pydantic import Field
 from steamship import SteamshipError, Block
@@ -68,6 +68,14 @@ class BaseAgent(PackageService, ABC):
     def get_agent(self):
         raise NotImplementedError()
 
+    def instance_init(self):
+        """This instance init method is called automatically when an instance of this package is created. It registers the URL of the instance as the Telegram webhook for messages."""
+        try:
+            telegram_webhook_url = self.context.invocable_url + 'telegram_respond'
+            self.comms.instance_init(telegram_webhook_url)
+        except Exception as e:
+            logging.error(e)
+            
     def run(self, prompt: str) -> str:
         return self.get_agent().run(input=prompt)
 
@@ -95,10 +103,26 @@ class BaseAgent(PackageService, ABC):
 
         return self.comms.web_transport_send(output_messages)
 
+    @post("telegram_respond", public=True)
+    def telegram_respond(self, **kwargs) -> List[Dict[str, Any]]:
+        """Endpoint implementing the Telegram WebHook contract. This is a PUBLIC endpoint since Telegram cannot pass a Bearer token."""
+        try:
+            input_message = self.comms.telegram_parse(**kwargs)
+            chain_output = self.run(input_message.text)
+            output_messages = self.chain_output_to_chat_messages(input_message, chain_output)
+        except SteamshipError as e:
+            output_messages = [ChatMessage(
+                client=self.client,
+                chat_id=kwargs.get("chat_session_id"),
+                text=response_for_exception(e)
+            )]
+
+        return self.comms.telegram_send(output_messages)
+
     @post("info")
     def info(self) -> dict:
         """Endpoint returning information about this bot."""
-        return {"telegram": "Hello There!"}
+        return self.comms.telegram_info()
 
     def chain_output_to_chat_messages(
         self, inbound_message: ChatMessage, chain_output: Union[str, List[str]]

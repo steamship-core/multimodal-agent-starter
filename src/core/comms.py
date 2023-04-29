@@ -50,6 +50,18 @@ class CommsChannels:
             logging.error(ex)
         self.has_done_runtime_init = True
 
+    def instance_init(self, telegram_endpoint: str):
+        """This instance_init method should be called from PackageService.instance_init."""
+        if not self.has_done_runtime_init:
+            self.runtime_init()
+
+        try:
+            # Register any required hooks.
+            self.telegram_transport.instance_init(webhook_url=telegram_endpoint)
+            self.web_transport.instance_init()
+        except Exception as ex:
+            logging.error(ex)
+
     def telegram_info(self) -> dict:
         """Endpoint returning information about this bot."""
         if not self.has_done_runtime_init:
