@@ -30,19 +30,23 @@ def main():
         while True:
             print(f"----- Agent Run {count} -----")
             prompt = input(colored(f"Prompt: ", "blue"))
-            results = get_results(client, answers["action"], prompt, as_api=debug_web_endpoint_via_localhost)
+            results = get_results(
+                client,
+                answers["action"],
+                prompt,
+                as_api=debug_web_endpoint_via_localhost,
+            )
             show_results(client, results)
             count += 1
 
-        
 
-def get_results(client: Steamship, action: str, prompt: str, as_api:bool=False):
+def get_results(client: Steamship, action: str, prompt: str, as_api: bool = False):
     if action == "Tool":
         tool = MyTool(client=client)
         return tool.run(prompt=prompt)
     else:
         agent = MyAgent(client=client)
-        
+
         # For Debugging
         if as_api:
             resp = agent.answer(question=prompt)
