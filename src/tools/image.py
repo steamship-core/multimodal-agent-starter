@@ -42,7 +42,7 @@ class GenerateImageTool(Tool):
         # Use the Steamship DALL-E plugin.
         image_generator = self.client.use_plugin(
             plugin_handle=PLUGIN_HANDLE, config={"n": 1, "size": "256x256"}
-        ),
+        )
 
         logging.info(f"[{self.name}] {prompt}")
         if not isinstance(prompt, str):
