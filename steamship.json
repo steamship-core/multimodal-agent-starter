@@ -1,0 +1,36 @@
+{
+	"type": "package",
+	"handle": "",
+	"version": "0.0.1-rc.1",
+	"description": "",
+	"author": "",
+	"entrypoint": "Unused",
+	"public": true,
+	"plugin": null,
+	"build_config": {
+		"ignore": [
+			"tests",
+			"examples"
+		]
+	},
+	"configTemplate": {
+	},
+	"steamshipRegistry": {
+		"tagline": "",
+		"tagline2": null,
+		"usefulFor": null,
+		"videoUrl": null,
+		"githubUrl": null,
+		"demoUrl": null,
+		"blogUrl": null,
+		"jupyterUrl": null,
+		"authorGithub": "",
+		"authorName": "",
+		"authorEmail": null,
+		"authorTwitter": null,
+		"authorUrl": null,
+		"tags": [
+			"Harvard"
+		]
+	}
+}
