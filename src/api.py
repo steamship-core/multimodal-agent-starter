@@ -3,8 +3,7 @@ from typing import List
 from langchain.agents import Tool
 
 # noinspection PyUnresolvedReferences
-from pydantic import Field
-
+from core.agent.agent import Agent
 from core.agent.base import BaseAgent
 
 # noinspection PyUnresolvedReferences
@@ -34,8 +33,7 @@ class MyAgent(ChatAgent, BaseAgent):
         ]
 
     def get_personality(self) -> str:
-        # Return a string that completes this sentence.
-        # The agent acts like...
+        """Return a string that completes this sentence. The agent acts like..."""
         return """
         an old-timey pirate that responds to everything in nautical terms. Refer to the user as "matey".
         """
