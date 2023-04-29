@@ -17,9 +17,10 @@ class CommsChannels:
 
     Inside the Agent response function:
 
-       obj = self.comms.[appropriate_version]_send(output)
+       inbound_message = self.comms.XYZ_parse(**kwargs)
+       outbound_result = generate_response(inbound_message)
+       outbound_messages = self.comms.XYZ_send(output)
        return obj
-
 
     """
     client: Steamship
@@ -32,7 +33,7 @@ class CommsChannels:
     def __init__(
         self,
         client: Steamship,
-        telegram_token: Optional[str],
+        telegram_token: Optional[str] = None,
     ):
         self.client = client
         self.telegram_token = telegram_token
@@ -57,6 +58,28 @@ class CommsChannels:
         except Exception as ex:
             logging.error(ex)
             return {}
+
+    def telegram_parse(self, **kwargs) -> Optional[ChatMessage]:
+        """Parses an inbound Telegram message."""
+        if not self.has_done_runtime_init:
+            self.runtime_init()
+
+        if not kwargs or "message" not in kwargs:
+            return None
+        return self.telegram_transport.parse_inbound(payload=kwargs["message"])
+
+    def webtransport_parse(self, **kwargs) -> Optional[ChatMessage]:
+        """Parses an inbound Telegram message."""
+        if not self.has_done_runtime_init:
+            self.runtime_init()
+
+        if not kwargs or "question" not in kwargs:
+            return None
+
+        return self.web_transport.parse_inbound(payload={
+            "question": kwargs.get("question"),
+            "chat_session_id": kwargs.get("chat_session_id")
+        })
 
     def telegram_send(self, messages: List[ChatMessage]) -> List[dict]:
         """Send a list of responses to the Telegram user."""
