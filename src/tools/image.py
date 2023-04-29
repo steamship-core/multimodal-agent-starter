@@ -31,6 +31,11 @@ class GenerateImageTool(Tool):
             client=client
         )
 
+    @property
+    def is_single_input(self) -> bool:
+        """Whether the tool only accepts a single input."""
+        return True
+
     def run(self, prompt: str, **kwargs) -> str:
         """Respond to LLM prompt."""
 
