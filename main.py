@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, "src")
 from steamship import Steamship, SteamshipError
 from steamship.cli.ship_spinner import ship_spinner
 from termcolor import colored
