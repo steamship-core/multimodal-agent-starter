@@ -105,13 +105,15 @@ class BaseAgent(PackageService, ABC):
         return self.comms.telegram_info()
 
     def chain_output_to_chat_messages(self, inbound_message: ChatMessage, chain_output: Union[str, List[str]]) -> List[ChatMessage]:
-        """Turns the Tool/Chain response into a list of Blocks.
+        """Transform the output of the Tool/Chain into a list of ChatMessage objects..
 
-        The LLM will respond with either a string or a list of strings.
+        A tool/chain returns a string or list of strings. The string contents contains a sneak-route for mime encoding:
 
-        Each string is either:
-        - Text, or
-        - A UUID representing a block containing binary data.
+        It is either:
+        - A parseable UUID, representing a block containing binary data, or:
+        - Text
+
+        This method inspects each string and creates a block of the appropriate type.
         """
         ret = []
         for part_response in chain_output if isinstance(chain_output, list) else [chain_output]:
