@@ -1,5 +1,6 @@
 import abc
 import logging
+import re
 from abc import ABC
 from typing import List, Optional, Dict, Any
 
@@ -7,7 +8,7 @@ from langchain.agents import Tool
 from steamship import SteamshipError, Block
 from steamship.invocable import PackageService, post
 
-from utils import is_valid_uuid
+from utils import is_valid_uuid, UUID_PATTERN
 
 
 def response_for_exception(e: Optional[Exception]) -> str:
@@ -58,6 +59,9 @@ class BaseAgent(PackageService, ABC):
 
         try:
             response = self.run(question)
+            if isinstance(response, str):
+                response = UUID_PATTERN.split(response)
+                response = [re.sub(r"^\W+", "", el) for el in response]
         except SteamshipError as e:
             response = [response_for_exception(e)]
 

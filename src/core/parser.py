@@ -4,6 +4,8 @@ from typing import Union
 from langchain.agents.mrkl.output_parser import MRKLOutputParser
 from langchain.schema import AgentAction, AgentFinish
 
+from utils import UUID_PATTERN
+
 FINAL_ANSWER_ACTION = "Final Answer:"
 
 FORMAT_INSTRUCTIONS_W_TOOLS = """
@@ -42,12 +44,9 @@ class CustomParser(MRKLOutputParser):
     def parse(self, text: str) -> Union[AgentAction, AgentFinish]:
         if FINAL_ANSWER_ACTION in text:
             output = text.split(FINAL_ANSWER_ACTION)[-1].strip()
-            output = re.split(
-                r"([0-9A-Za-z]{8}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{4}-[0-9A-Za-z]{12})",
-                output,
-            )
-
+            output = UUID_PATTERN.split(output)
             output = [re.sub(r"^\W+", "", el) for el in output]
 
             return AgentFinish({"output": output}, text)
-        return super().parse(text)
+        cleaned_output = super().parse(text)
+        return cleaned_output
