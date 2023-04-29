@@ -10,8 +10,8 @@ from steamship.data.plugin.plugin_instance import PluginInstance
 NAME = "GenerateImage"
 
 DESCRIPTION = """
-Useful for when you need to generate an image. 
-Input: string that describes, in detail, the desired image
+Useful for when you need to generate an image. Provide a detailed text prompt for the desired image when invoking this
+tool. Always include any UUIDs as part of the final answer returned to the user.
 Output: the UUID of a generated image
 """
 
@@ -21,25 +21,31 @@ PLUGIN_HANDLE = "dall-e"
 class GenerateImageTool(Tool):
     """Tool used to generate images from a text-prompt."""
 
-    image_generator: PluginInstance
+    client: Steamship
 
     def __init__(self, client: Steamship):
-
         super().__init__(
-            name=NAME,
-            func=self.run,
-            description=DESCRIPTION,
-            image_generator=client.use_plugin(
-                plugin_handle=PLUGIN_HANDLE, config={"n": 1, "size": "256x256"}
-            ),
+            name=NAME, func=self.run, description=DESCRIPTION, client=client
         )
+
+    @property
+    def is_single_input(self) -> bool:
+        """Whether the tool only accepts a single input."""
+        return True
 
     def run(self, prompt: str, **kwargs) -> str:
         """Respond to LLM prompt."""
+
+        # Use the Steamship DALL-E plugin.
+        image_generator = self.client.use_plugin(
+            plugin_handle=PLUGIN_HANDLE, config={"n": 1, "size": "256x256"}
+        )
+
         logging.info(f"[{self.name}] {prompt}")
         if not isinstance(prompt, str):
             prompt = json.dumps(prompt)
-        task = self.image_generator.generate(text=prompt, append_output_to_file=True)
+
+        task = image_generator.generate(text=prompt, append_output_to_file=True)
         task.wait()
         blocks = task.output.blocks
         logging.info(f"[{self.name}] got back {len(blocks)} blocks")

@@ -12,21 +12,24 @@ Useful for when you need to answer questions about current events
 
 
 class SearchTool(Tool):
-    """Tool used to schedule reminders via the Steamship Task system."""
+    """Tool used to search for information using SERP API."""
 
-    search: SteamshipSERP
+    client: Steamship
 
     def __init__(self, client: Steamship):
         super().__init__(
-            name=NAME,
-            func=self.run,
-            description=DESCRIPTION,
-            search=SteamshipSERP(client=client),
+            name=NAME, func=self.run, description=DESCRIPTION, client=client
         )
+
+    @property
+    def is_single_input(self) -> bool:
+        """Whether the tool only accepts a single input."""
+        return True
 
     def run(self, prompt: str, **kwargs) -> str:
         """Respond to LLM prompts."""
-        return self.search.search(prompt)
+        search = SteamshipSERP(client=self.client)
+        return search.search(prompt)
 
 
 if __name__ == "__main__":
