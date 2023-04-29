@@ -23,7 +23,7 @@ def is_valid_uuid(uuid_to_test: str, version=4) -> bool:
 
 
 def show_result(client: Steamship, result: str):
-    maybe_block_id = UUID_PATTERN.search(result)
+    maybe_block_id = UUID_PATTERN.search(result or "")
     if maybe_block_id:
         print(f"LLM response ('{result}') contained an image: ", end="")
         signed_url = _make_image_public(client, maybe_block_id.group())
