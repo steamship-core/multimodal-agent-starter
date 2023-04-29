@@ -1,7 +1,7 @@
 {
 	"type": "package",
 	"handle": "",
-	"version": "0.0.1-rc.1",
+	"version": "0.0.1",
 	"description": "",
 	"author": "",
 	"entrypoint": "Unused",
@@ -14,6 +14,11 @@
 		]
 	},
 	"configTemplate": {
+		"telegram_token": {
+			"type": "string",
+			"description": "The secret token for your Telegram bot",
+			"default": ""
+		}
 	},
 	"steamshipRegistry": {
 		"tagline": "",
