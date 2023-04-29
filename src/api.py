@@ -12,6 +12,13 @@ from tools import SearchTool, GenerateImageTool
 
 
 class MyAgent(ChatAgent, BaseAgent):  # or Agent
+    """
+    If you want your agent to be tool-based, use the following line:
+        class MyAgent(Agent, BaseAgent)
+    If you want your agent to be chatty and personality-based, use the following line:
+        class MyAgent(ChatAgent, BaseAgent)
+    """
+
     def is_verbose_logging_enabled(self) -> bool:
         return True
 
@@ -23,6 +30,7 @@ class MyAgent(ChatAgent, BaseAgent):  # or Agent
         ]
 
     def get_personality(self) -> str:
+        """Return a string that completes this sentence. The agent acts like..."""
         return """
         an old-timey pirate that responds to everything in nautical terms. Refer to the user as "matey".
         """

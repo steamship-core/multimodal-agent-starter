@@ -98,7 +98,7 @@ class BaseAgent(PackageService, ABC):
     @post("info")
     def info(self) -> dict:
         """Endpoint returning information about this bot."""
-        return {"telegram": "Hello There!"}
+        return self.comms.telegram_info()
 
     def chain_output_to_chat_messages(
         self, inbound_message: ChatMessage, chain_output: Union[str, List[str]]
