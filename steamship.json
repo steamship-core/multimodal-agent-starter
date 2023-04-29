@@ -1,7 +1,7 @@
 {
 	"type": "package",
-	"handle": "ted-testaa-bot",
-	"version": "0.0.1-rc.3",
+	"handle": "",
+	"version": "0.0.1",
 	"description": "",
 	"author": "",
 	"entrypoint": "Unused",
