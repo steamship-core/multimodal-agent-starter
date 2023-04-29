@@ -20,7 +20,7 @@ class CommsChannels:
        inbound_message = self.comms.XYZ_parse(**kwargs)
        outbound_result = generate_response(inbound_message)
        outbound_messages = self.comms.XYZ_send(output)
-       return obj
+       return outbound_messages
 
     """
     client: Steamship
