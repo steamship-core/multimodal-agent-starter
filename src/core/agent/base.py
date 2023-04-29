@@ -1,16 +1,9 @@
 import abc
-import logging
 from abc import ABC
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 
 from langchain.agents import Tool
-from steamship import SteamshipError, Block
-from steamship.invocable import PackageService, post
-
-from utils import is_valid_uuid
-
-TEMPERATURE = 0.7
-MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
+from steamship.invocable import PackageService
 
 
 def response_for_exception(e: Optional[Exception]) -> str:

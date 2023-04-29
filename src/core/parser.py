@@ -1,8 +1,8 @@
 import re
 from typing import Union
 
-from langchain.agents import AgentOutputParser
-from langchain.schema import AgentAction, AgentFinish, OutputParserException
+from langchain.agents.mrkl.output_parser import MRKLOutputParser
+from langchain.schema import AgentAction, AgentFinish
 
 FINAL_ANSWER_ACTION = "Final Answer:"
 
@@ -35,10 +35,7 @@ def get_format_instructions(has_tools=True) -> str:
         return FORMAT_INSTRUCTIONS_WO_TOOLS
 
 
-class CustomParser(AgentOutputParser):
-    @property
-    def _type(self) -> str:
-        return ""
+class CustomParser(MRKLOutputParser):
 
     def get_format_instructions(self) -> str:
         return get_format_instructions(True)
@@ -54,13 +51,4 @@ class CustomParser(AgentOutputParser):
             output = [re.sub(r"^\W+", "", el) for el in output]
 
             return AgentFinish({"output": output}, text)
-        # \s matches against tab/newline/whitespace
-        regex = (
-            r"Action\s*\d*\s*:[\s]*(.*?)[\s]*Action\s*\d*\s*Input\s*\d*\s*:[\s]*(.*)"
-        )
-        match = re.search(regex, text, re.DOTALL)
-        if not match:
-            raise OutputParserException(f"Could not parse LLM output: `{text}`")
-        action = match.group(1).strip()
-        action_input = match.group(2)
-        return AgentAction(action, action_input.strip(" ").strip('"'), text)
+        return super().parse(text)

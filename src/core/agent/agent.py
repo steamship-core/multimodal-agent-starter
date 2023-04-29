@@ -1,7 +1,6 @@
 import logging
 from typing import Optional, List, Dict, Any
 
-from langchain import LLMChain
 from langchain.agents import AgentExecutor, ZeroShotAgent
 from steamship import SteamshipError, Block
 from steamship.invocable import post
@@ -12,43 +11,31 @@ from core.parser import get_format_instructions, CustomParser
 from utils import is_valid_uuid
 
 TEMPERATURE = 0.7
-MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
 
 
 class Agent(BaseAgent):
 
-    def get_prompt(self, tools):
-        prefix = self.get_personality()
-        suffix = """Question: {input}
-    {agent_scratchpad}"""
-        return ZeroShotAgent.create_prompt(
-            tools,
-            format_instructions=get_format_instructions(bool(tools)),
-            prefix=prefix,
-            suffix=suffix,
-            input_variables=["input", "agent_scratchpad"],
-        )
-
     def get_agent(self):
-        llm = OpenAI(client=self.client, temperature=0)
+        llm = OpenAI(client=self.client, temperature=TEMPERATURE)
 
         tools = self.get_tools()
-        prompt = self.get_prompt(tools)
-        llm_chain = LLMChain(llm=llm, prompt=prompt)
+        prefix = self.get_personality()
+        suffix = """Question: {input}
+           {agent_scratchpad}"""
 
-        tool_names = [tool.name for tool in tools]
-        agent = ZeroShotAgent(
-            llm_chain=llm_chain,
-            allowed_tools=tool_names,
-            verbose=self.is_verbose_logging_enabled(),
-            output_parser=CustomParser(),
+        agent = ZeroShotAgent.from_llm_and_tools(
+            llm,
+            tools,
+            prefix=prefix,
+            suffix=suffix,
+            format_instructions=get_format_instructions(bool(tools)),
+            output_parser=CustomParser()
         )
-
-        agent_executor = AgentExecutor.from_agent_and_tools(
-            agent=agent, tools=tools, verbose=self.is_verbose_logging_enabled()
+        return AgentExecutor.from_agent_and_tools(
+            agent=agent,
+            tools=tools,
+            verbose=self.is_verbose_logging_enabled()
         )
-
-        return agent_executor
 
     @post("answer", public=True)
     def answer(
