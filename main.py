@@ -18,13 +18,20 @@ def main():
     ]
     answers = inquirer.prompt(questions)
 
+    is_tool = answers['action'] == 'Tool'
+
     with Steamship.temporary_workspace() as client:
-        print(f"Starting {answers['action']}...\nIf you make changes to the {answers['action']}, "
-              f"you will need to restart this client. Press CTRL+C to exit at any time.\n")
+        if is_tool:
+            tool = MyTool(client=client)
+            print(f"Starting {answers['action']} {tool.name}...")
+        else:
+            print(f"Starting {answers['action']}...")
+
+        print(f"If you make code changes, you will need to restart this client. Press CTRL+C to exit at any time.\n")
 
         count = 1
         while True:
-            print(f"----- Agent Run {count} -----")
+            print(f"----- {answers['action']} Run {count} -----")
             prompt = input(colored(f"Prompt: ", "blue"))
             results = get_results(client, answers["action"], prompt)
             show_results(client, results)
