@@ -51,7 +51,7 @@ class CustomParser(AgentOutputParser):
                 output,
             )
 
-            output = [re.sub(r"^[^\w]+", "", el) for el in output]
+            output = [re.sub(r"^\W+", "", el) for el in output]
 
             return AgentFinish({"output": output}, text)
         # \s matches against tab/newline/whitespace

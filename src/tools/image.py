@@ -10,8 +10,8 @@ from steamship.data.plugin.plugin_instance import PluginInstance
 NAME = "GenerateImage"
 
 DESCRIPTION = """
-Useful for when you need to generate an image. 
-Input: string that describes, in detail, the desired image
+Useful for when you need to generate an image. Provide a detailed text prompt for the desired image when invoking this
+tool. Always include any UUIDs as part of the final answer returned to the user.
 Output: the UUID of a generated image
 """
 
@@ -34,11 +34,17 @@ class GenerateImageTool(Tool):
             ),
         )
 
+    @property
+    def is_single_input(self) -> bool:
+        """Whether the tool only accepts a single input."""
+        return True
+
     def run(self, prompt: str, **kwargs) -> str:
         """Respond to LLM prompt."""
         logging.info(f"[{self.name}] {prompt}")
         if not isinstance(prompt, str):
             prompt = json.dumps(prompt)
+
         task = self.image_generator.generate(text=prompt, append_output_to_file=True)
         task.wait()
         blocks = task.output.blocks
