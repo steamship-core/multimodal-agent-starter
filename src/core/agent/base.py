@@ -109,6 +109,9 @@ class BaseAgent(PackageService, ABC):
         try:
             input_message = self.comms.telegram_parse(**kwargs)
             chain_output = self.run(input_message.text)
+            if isinstance(chain_output, str):
+                chain_output = UUID_PATTERN.split(chain_output)
+                chain_output = [re.sub(r"^\W+", "", el) for el in chain_output]
             output_messages = self.chain_output_to_chat_messages(input_message, chain_output)
         except SteamshipError as e:
             output_messages = [ChatMessage(

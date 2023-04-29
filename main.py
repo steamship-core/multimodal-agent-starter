@@ -32,7 +32,8 @@ def main():
 
         count = 1
 
-        debug_web_endpoint_via_localhost = False
+        # Set to true to debug the Web Client / Telegram Client interfaces
+        debug_web_endpoint_via_localhost = True
 
         while True:
             print(f"----- {answers['action']} Run {count} -----")
@@ -56,9 +57,12 @@ def get_results(client: Steamship, action: str, prompt: str, as_api: bool = Fals
 
         # For Debugging
         if as_api:
-            resp = agent.answer(question=prompt)
-            return resp
+            # Web client simulation
+            # resp = agent.answer(question=prompt)
 
+            # Telegram client simulation
+            resp = agent.telegram_respond(message={"chat": {"id": 123}, "message_id": 123, "text": prompt})
+            return resp
         if (
             not agent.is_verbose_logging_enabled()
         ):  # display progress when verbose is False
