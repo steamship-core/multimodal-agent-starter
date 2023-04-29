@@ -11,7 +11,7 @@ from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool
 
 
-class MyAgent(ChatAgent, BaseAgent):  # or Agent
+class MyAgent(Agent, BaseAgent):  # or Agent
     """
     If you want your agent to be tool-based, use the following line:
         class MyAgent(Agent, BaseAgent)

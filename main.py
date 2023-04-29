@@ -1,4 +1,5 @@
 import sys
+
 sys.path.insert(0, "src")
 from steamship import Steamship, SteamshipError
 from steamship.cli.ship_spinner import ship_spinner
@@ -35,7 +36,7 @@ def main():
         count = 1
 
         # Set to true to debug the Web Client / Telegram Client interfaces
-        debug_web_endpoint_via_localhost = True
+        debug_web_endpoint_via_localhost = False
 
         while True:
             print(f"----- {answers['action']} Run {count} -----")

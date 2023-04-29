@@ -71,11 +71,11 @@ class BaseAgent(PackageService, ABC):
     def instance_init(self):
         """This instance init method is called automatically when an instance of this package is created. It registers the URL of the instance as the Telegram webhook for messages."""
         try:
-            telegram_webhook_url = self.context.invocable_url + 'telegram_respond'
+            telegram_webhook_url = self.context.invocable_url + "telegram_respond"
             self.comms.instance_init(telegram_webhook_url)
         except Exception as e:
             logging.error(e)
-            
+
     def run(self, prompt: str) -> str:
         return self.get_agent().run(input=prompt)
 
@@ -112,13 +112,17 @@ class BaseAgent(PackageService, ABC):
             if isinstance(chain_output, str):
                 chain_output = UUID_PATTERN.split(chain_output)
                 chain_output = [re.sub(r"^\W+", "", el) for el in chain_output]
-            output_messages = self.chain_output_to_chat_messages(input_message, chain_output)
+            output_messages = self.chain_output_to_chat_messages(
+                input_message, chain_output
+            )
         except SteamshipError as e:
-            output_messages = [ChatMessage(
-                client=self.client,
-                chat_id=kwargs.get("chat_session_id"),
-                text=response_for_exception(e)
-            )]
+            output_messages = [
+                ChatMessage(
+                    client=self.client,
+                    chat_id=kwargs.get("chat_session_id"),
+                    text=response_for_exception(e),
+                )
+            ]
 
         return self.comms.telegram_send(output_messages)
 
