@@ -11,7 +11,7 @@ TEMPERATURE = 0.7
 MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
 
 
-class MyAgent(ChatAgent):
+class MyAgent(ChatAgent): # or Agent
 
     def is_verbose_logging_enabled(self) -> bool:
         return False
