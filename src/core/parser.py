@@ -31,10 +31,7 @@ Final Answer: the final answer to the original input question
 
 
 def get_format_instructions(has_tools=True) -> str:
-    if has_tools:
-        return FORMAT_INSTRUCTIONS_W_TOOLS
-    else:
-        return FORMAT_INSTRUCTIONS_WO_TOOLS
+    return FORMAT_INSTRUCTIONS_W_TOOLS if has_tools else FORMAT_INSTRUCTIONS_WO_TOOLS
 
 
 class CustomParser(MRKLOutputParser):
