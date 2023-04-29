@@ -60,11 +60,10 @@ def get_results(client: Steamship, action: str, prompt: str, as_api: bool = Fals
         # For Debugging
         if as_api:
             # Web client simulation
-            # resp = agent.answer(question=prompt)
+            return agent.answer(question=prompt)
 
             # Telegram client simulation
-            resp = agent.telegram_respond(message={"chat": {"id": 123}, "message_id": 123, "text": prompt})
-            return resp
+            # return agent.telegram_respond(message={"chat": {"id": 123}, "message_id": 123, "text": prompt})
         if (
             not agent.is_verbose_logging_enabled()
         ):  # display progress when verbose is False
