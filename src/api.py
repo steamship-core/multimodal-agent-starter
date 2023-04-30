@@ -5,16 +5,19 @@ from langchain.agents import Tool
 # noinspection PyUnresolvedReferences
 from core.agent.agent import Agent
 from core.agent.base import BaseAgent
+
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
+
 # noinspection PyUnresolvedReferences
 from tools import SearchTool, GenerateImageTool, MyTool
 
 
-class MyAgent(Agent, BaseAgent):  # or Agent
+class MyAgent(Agent, BaseAgent):
     """
     If you want your agent to be tool-based, use the following line:
         class MyAgent(Agent, BaseAgent)
+
     If you want your agent to be chatty and personality-based, use the following line:
         class MyAgent(ChatAgent, BaseAgent)
     """

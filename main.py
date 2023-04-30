@@ -13,6 +13,7 @@ from tools import MyTool
 
 
 def main():
+    Steamship()
     questions = [
         inquirer.List(
             "action",
@@ -22,7 +23,6 @@ def main():
         ),
     ]
     answers = inquirer.prompt(questions)
-    answers = {"action": "Agent"}
     is_tool = answers["action"] == "Tool"
 
     with Steamship.temporary_workspace() as client:
