@@ -8,6 +8,8 @@ from core.agent.base import BaseAgent
 
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
+
+# noinspection PyUnresolvedReferences
 from tools import SearchTool, GenerateImageTool
 
 
@@ -24,9 +26,9 @@ class MyAgent(Agent, BaseAgent):  # or Agent
 
     def get_tools(self) -> List[Tool]:
         return [
-            SearchTool(self.client),
+            # SearchTool(self.client),
             # MyTool(self.client),
-            GenerateImageTool(self.client),
+            # GenerateImageTool(self.client),
         ]
 
     def get_personality(self) -> str:

@@ -24,5 +24,5 @@ print(bot.package_version_handle)
 print(
     f"""Chat with your bot here: 
     
-    https://www.steamship.com/workspaces/{client.config.workspace_handle}/packages/{bot.handle}"""
+https://www.steamship.com/workspaces/{client.config.workspace_handle}/packages/{bot.handle}"""
 )

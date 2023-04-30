@@ -1,5 +1,7 @@
 import sys
 
+import inquirer
+
 sys.path.insert(0, "src")
 from steamship import Steamship, SteamshipError
 from steamship.cli.ship_spinner import ship_spinner
@@ -11,14 +13,15 @@ from tools import MyTool
 
 
 def main():
-    # questions = [
-    #     inquirer.List('action',
-    #                   message="Do you want to run your agent or your tool?",
-    #                   choices=['Agent', 'Tool'],
-    #                   carousel=True
-    #                   ),
-    # ]
-    # answers = inquirer.prompt(questions)
+    questions = [
+        inquirer.List(
+            "action",
+            message="Do you want to run your agent or your tool?",
+            choices=["Agent", "Tool"],
+            carousel=True,
+        ),
+    ]
+    answers = inquirer.prompt(questions)
     answers = {"action": "Agent"}
     is_tool = answers["action"] == "Tool"
 
