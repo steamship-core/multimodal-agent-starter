@@ -5,12 +5,10 @@ from langchain.agents import Tool
 # noinspection PyUnresolvedReferences
 from core.agent.agent import Agent
 from core.agent.base import BaseAgent
-
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
-
 # noinspection PyUnresolvedReferences
-from tools import SearchTool, GenerateImageTool
+from tools import SearchTool, GenerateImageTool, MyTool
 
 
 class MyAgent(Agent, BaseAgent):  # or Agent
