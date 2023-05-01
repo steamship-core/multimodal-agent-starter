@@ -10,8 +10,8 @@ from steamship.data.plugin.plugin_instance import PluginInstance
 NAME = "GenerateImage"
 
 DESCRIPTION = """
-Useful for when you need to generate an image. Provide a detailed text prompt for the desired image when invoking this
-tool. Always include any UUIDs as part of the final answer returned to the user.
+Useful for when you need to generate an image. 
+Input: A detailed dall-e prompt describing an image 
 Output: the UUID of a generated image
 """
 

@@ -26,7 +26,9 @@ def show_result(client: Steamship, result: str):
     maybe_block_id = UUID_PATTERN.search(result or "")
     if maybe_block_id:
         print(f"LLM response ('{result}') contained an image: ", end="")
-        signed_url = _make_image_public(client, maybe_block_id.group())
+        signed_url = _make_image_public(
+            client, Block.get(client, _id=maybe_block_id.group())
+        )
         result = signed_url
     print(result, end="\n\n")
 
@@ -40,8 +42,7 @@ def show_results(client: Steamship, results):
             show_result(client, result)
 
 
-def _make_image_public(client, result):
-    block = Block.get(client, _id=result)
+def _make_image_public(client, block):
     filepath = str(uuid.uuid4())
     signed_url = (
         client.get_workspace()

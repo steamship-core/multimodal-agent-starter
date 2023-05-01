@@ -1,8 +1,9 @@
 import abc
+import logging
 import re
 from abc import ABC
 from typing import List, Optional, Dict, Any, Type, Union
-import logging
+
 from langchain.agents import Tool
 from pydantic import Field
 from steamship import SteamshipError, Block
@@ -10,7 +11,7 @@ from steamship.experimental.transports.chat import ChatMessage
 from steamship.invocable import PackageService, post, Config
 
 from core.comms import CommsChannels
-from utils import is_valid_uuid, UUID_PATTERN
+from utils import is_valid_uuid, UUID_PATTERN, _make_image_public
 
 
 def response_for_exception(e: Optional[Exception]) -> str:
@@ -147,13 +148,15 @@ class BaseAgent(PackageService, ABC):
         ):
             if is_valid_uuid(part_response):
                 # It's a block containing binary data.
-                block = Block.get(self.client, _id=part_response).dict()
-                block["who"] = "bot"
+                block = Block.get(self.client, _id=part_response)
+                block_dict = block.dict()
+                block_dict["who"] = "bot"
+                block_dict["url"] = _make_image_public(self.client, block)
                 ret.append(
                     ChatMessage(
                         client=self.client,
                         chat_id=inbound_message.get_chat_id(),
-                        **block,
+                        **block_dict,
                     )
                 )
             else:
