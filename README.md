@@ -6,19 +6,21 @@ Create your own LLM Agent with custom personality and Tools.
 
 ## Getting Started
 
-### ..in a Local VS Code Container
+You can be up and running in under a minute.
+
+**..in a Local VS Code Container**
 
 Just click here: [![Open in a VS Code Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/steamship-core/hackathon-starter)
 
-### ..in a Web VS Code Container
+**..in a Web VS Code Container**
 
 Visit [https://github.dev/steamship-core/hackathon-starter](https://github.dev/steamship-core/hackathon-starter), then click on the "Cloud Container" icon at lower-left and re-open in a new Docker container.
 
-## ..on Replit
+**..on Replit**
 
 Visit [https://steamship.com/hackathon/harvard](https://steamship.com/hackathon/harvard), and click on "Starter Project".
 
-### ..on localhost with your own IDE
+**..on localhost with your own IDE**
 
 Clone this repository, then set up a Python virtual environment with:
 
