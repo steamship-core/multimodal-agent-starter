@@ -11,6 +11,7 @@ from steamship.experimental.transports.chat import ChatMessage
 from steamship.invocable import PackageService, post, Config
 
 from core.comms import CommsChannels
+from src.core.memory import Memory
 from utils import is_valid_uuid, UUID_PATTERN, _make_image_public
 
 
@@ -42,6 +43,7 @@ class BaseAgent(PackageService, ABC):
     name: str = "MyAgent"
     config: BaseAgentConfig
     comms: CommsChannels
+    memory: Memory
 
     @classmethod
     def config_cls(cls) -> Type[Config]:
@@ -49,6 +51,9 @@ class BaseAgent(PackageService, ABC):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.memory = Memory(
+            self.client
+        )
         self.comms = CommsChannels(
             self.client, telegram_token=self.config.telegram_token
         )
