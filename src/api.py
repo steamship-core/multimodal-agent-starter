@@ -10,7 +10,7 @@ from core.agent.base import BaseAgent
 from core.agent.chat_agent import ChatAgent
 
 # noinspection PyUnresolvedReferences
-from tools import SearchTool, GenerateImageTool, MyTool
+from tools import SearchTool, GenerateImageTool, MyTool, GenerateAlbumArtTool
 
 
 class MyAgent(Agent, BaseAgent):
@@ -30,6 +30,7 @@ class MyAgent(Agent, BaseAgent):
             # SearchTool(self.client),
             # MyTool(self.client),
             # GenerateImageTool(self.client),
+            # GenerateAlbumArtTool(self.client)
         ]
 
     def get_personality(self) -> str:
