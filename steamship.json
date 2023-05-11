@@ -1,7 +1,7 @@
 {
 	"type": "package",
 	"handle": "hackaton-bot",
-	"version": "0.0.1-rc.25",
+	"version": "0.0.1-rc.27",
 	"description": "",
 	"author": "",
 	"entrypoint": "Unused",

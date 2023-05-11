@@ -3,13 +3,14 @@ from typing import List
 from langchain.agents import Tool
 
 # noinspection PyUnresolvedReferences
+from steamship.experimental.package_starters.telegram_bot import TelegramBot
+
 from core.agent.agent import Agent
 
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
 
 # noinspection PyUnresolvedReferences
-from core.agent.telegram_bot import TelegramBot
 
 # noinspection PyUnresolvedReferences
 from tools import SearchTool, GenerateImageTool, MyTool, GenerateAlbumArtTool

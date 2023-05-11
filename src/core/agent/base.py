@@ -3,9 +3,9 @@ from typing import List, Optional
 
 from langchain.agents import Tool
 from steamship import Block
+from steamship.experimental.package_starters.telegram_bot import TelegramBot
 from steamship.experimental.transports.chat import ChatMessage
 
-from core.agent.telegram_bot import TelegramBot
 from core.agent.utils import is_valid_uuid, _make_image_public
 
 
