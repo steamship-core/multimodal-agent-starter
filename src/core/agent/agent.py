@@ -1,19 +1,15 @@
-import logging
-from typing import Optional, List, Dict, Any
+from abc import ABC
 
 from langchain.agents import AgentExecutor, ZeroShotAgent
-from steamship import SteamshipError, Block
-from steamship.invocable import post
 from steamship_langchain import OpenAI
 
-from core.agent.base import BaseAgent, response_for_exception
+from core.agent.base import BaseAgent
 from core.parser import get_format_instructions, CustomParser
-from utils import is_valid_uuid
 
 TEMPERATURE = 0.7
 
 
-class Agent(BaseAgent):
+class Agent(BaseAgent, ABC):
     def get_agent(self):
         llm = OpenAI(client=self.client, temperature=TEMPERATURE)
 

@@ -1,3 +1,5 @@
+from abc import ABC
+
 from langchain.agents import AgentExecutor, ConversationalChatAgent
 from langchain.agents.conversational_chat.prompt import PREFIX
 from langchain.memory import ConversationBufferWindowMemory
@@ -10,7 +12,7 @@ TEMPERATURE = 0.7
 MODEL_NAME = "gpt-3.5-turbo"  # or "gpt-4"
 
 
-class ChatAgent(BaseAgent):
+class ChatAgent(BaseAgent, ABC):
     name: str = "MyAgent"
 
     def get_agent(self):

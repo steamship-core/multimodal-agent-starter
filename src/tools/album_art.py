@@ -42,9 +42,9 @@ class GenerateAlbumArtTool(Tool):
         super().__init__(
             name=NAME,
             func=self.run,
-            description=DESCRIPTION, 
+            description=DESCRIPTION,
             client=client,
-            tool=GenerateImageTool(client)
+            tool=GenerateImageTool(client),
         )
 
     @property

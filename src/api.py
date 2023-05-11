@@ -3,8 +3,9 @@ from typing import List
 from langchain.agents import Tool
 
 # noinspection PyUnresolvedReferences
+from steamship.experimental.package_starters.telegram_bot import TelegramBot
+
 from core.agent.agent import Agent
-from core.agent.base import BaseAgent
 
 # noinspection PyUnresolvedReferences
 from core.agent.chat_agent import ChatAgent
@@ -13,7 +14,7 @@ from core.agent.chat_agent import ChatAgent
 from tools import SearchTool, GenerateImageTool, MyTool, GenerateAlbumArtTool
 
 
-class MyAgent(Agent, BaseAgent):
+class MyAgent(Agent, TelegramBot):
     """
     If you want your agent to be tool-based, use the following line:
         class MyAgent(Agent, BaseAgent)
@@ -29,7 +30,7 @@ class MyAgent(Agent, BaseAgent):
         return [
             # SearchTool(self.client),
             # MyTool(self.client),
-            # GenerateImageTool(self.client),
+            GenerateImageTool(self.client),
             # GenerateAlbumArtTool(self.client)
         ]
 

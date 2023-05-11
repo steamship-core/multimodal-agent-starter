@@ -4,7 +4,7 @@ from typing import Union
 from langchain.agents.mrkl.output_parser import MRKLOutputParser
 from langchain.schema import AgentAction, AgentFinish
 
-from utils import UUID_PATTERN
+from core.agent.utils import UUID_PATTERN
 
 FINAL_ANSWER_ACTION = "Final Answer:"
 
