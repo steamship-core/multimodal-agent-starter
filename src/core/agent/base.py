@@ -65,7 +65,6 @@ class BaseAgent(TelegramBot, ABC):
                     client=self.client,
                     chat_id=chat_id,
                     text=part_response,
-                    who="bot",
                 )
 
             ret.append(message)
