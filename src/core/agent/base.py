@@ -42,13 +42,13 @@ class BaseAgent(TelegramBot, ABC):
     def chain_output_to_chat_messages(
         self, chat_id: str, chain_output: List[str]
     ) -> List[ChatMessage]:
-        """Transform the output of the Chain/Agent into a list of ChatMessage objects.
+        """Transform the output of the Multi-Modal Agent into a list of ChatMessage objects.
 
-        A Chain/Agent returns a string or list of strings. The string contents contains a sneak-route for mime encoding:
-        It is either:
-        - A parseable UUID, representing a block containing binary data, or:
+        The response of a ulti-Modal Agent contains one or more:
+        - parseable UUIDs, representing a block containing binary data, or:
         - Text
-        This method inspects each string and creates a block of the appropriate type.
+
+        This method inspects each string and creates a ChatMessage of the appropriate type.
         """
         ret = []
         for part_response in chain_output:
