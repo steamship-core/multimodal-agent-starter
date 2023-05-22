@@ -12,6 +12,9 @@ from steamship.agents.tools.search.search import SearchTool
 from steamship.utils.repl import AgentREPL
 
 from core_prompt_builder import make_core_prompt
+from example_personalities.annoyed_robot import get_prompt
+from prompts import PROMPT
+
 
 
 class MyAssistant(AgentService):
