@@ -9,6 +9,7 @@ from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.image_generation.generate_image import GenerateImageTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.utils.repl import AgentREPL
+from prompts import PROMPT
 
 
 
@@ -20,17 +21,15 @@ class MyAssistant(AgentService):
             GenerateImageTool(),
         ]
         self.planner = ReACTPlanner(tools=self.tools, llm="This is not yet used")
+        self.planner.PROMPT = PROMPT
 
     def create_response(self, context: AgentContext) -> Optional[List[Block]]:
 
         if len(context.emit_funcs) == 0:
             context.emit_funcs.append(self._send_message_agent)
 
-        # pull up User<->Agent chat history, and append latest Human Input
-        # this is distinct from any sort of history related to agent execution
-        # chat_file = ChatFile.get(...)
-        # chat_file.append_user_block(text=incoming_message.text)
-        # current_context.chat_history = chat_file
+        if len(context.chat_history.messages) == 0:
+            context.chat_history.append_system_message()
 
         self.run_agent(context)
 
