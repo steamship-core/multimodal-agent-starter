@@ -27,11 +27,11 @@ class GoogleChatbot(AgentService):
         self.planner = ReACTPlanner(
             tools=[
                 SearchTool(),
-                GoogleImageSearchTool(),
+                GoogleImageSearchTool()
             ],
             llm=OpenAI(self.client),
         )
-        self.planner.PROMPT = PROMPT
+        self.planner.PROMPT = self.get_personality()
 
     def create_response(self, context: AgentContext) -> Optional[List[Block]]:
 

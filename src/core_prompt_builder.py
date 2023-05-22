@@ -52,8 +52,9 @@ Thought: Do I need to use a tool? No
 AI: [your final response here which ALWAYS includes UUID of generated images]
 
 Make sure to use all observations to come up with your final response. 
-ALWAYS copy the UUID of images into your final response!
-ALWAYS come up with a final response after generating an image and make sure to include the UUID of that image.
+If an observation included a media UUID, ALWAYS copy it into the final response.
+If an observation included a media UUID, ALWAYS come up with a final response along with an explanation.
+If an observation did not include a media UUID, to not return a placeholder message.
 ```
 
 Begin!
