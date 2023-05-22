@@ -54,7 +54,7 @@ class GoogleChatbot(AgentService):
         print(f"\n\nTELEGRAM SENDING MESSAGES:\n{blocks}")
         # self.telegram_transport.send(messages)
 
-    def get_prompt(self):
+    def get_personality(self):
         return make_core_prompt(
             name="Assistant",
             byline="an assistant who helps search the web.",

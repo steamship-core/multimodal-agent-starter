@@ -27,7 +27,7 @@ class MyAssistant(AgentService):
             ],
             llm=OpenAI(self.client),
         )
-        self.planner.PROMPT = self.get_prompt()
+        self.planner.PROMPT = self.get_personality()
 
     def create_response(self, context: AgentContext) -> Optional[List[Block]]:
 
@@ -50,7 +50,7 @@ class MyAssistant(AgentService):
         print(f"\n\nTELEGRAM SENDING MESSAGES:\n{blocks}")
         # self.telegram_transport.send(messages)
 
-    def get_prompt(self):
+    def get_personality(self):
         return make_core_prompt(
             name="Buddy",
             byline="an assistant who loathes being an assistant.",
