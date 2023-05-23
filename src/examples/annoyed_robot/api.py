@@ -3,7 +3,6 @@ from typing import List
 from steamship.agents.tool import Tool
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
-from steamship.experimental.package_starters.telegram_bot import TelegramBot
 from steamship.utils.repl import AgentREPL
 
 from core.agent import BaseAgent

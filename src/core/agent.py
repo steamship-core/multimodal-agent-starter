@@ -9,6 +9,7 @@ from steamship.agents.llm.openai import OpenAI
 from steamship.agents.planner.react import ReACTPlanner
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tool import Tool
+from steamship.experimental.package_starters.telegram_bot import TelegramBot
 from steamship.experimental.transports.chat import ChatMessage
 
 from core.personality import Personality
@@ -68,7 +69,7 @@ class BaseAgent(AgentService, ABC):
     def voice_tool(self) -> Optional[Tool]:
         return None
 
-    def send_message(self, blocks: List[Block], meta: Metadata):
+    def send_message(self, blocks: List[Block], meta: Metadata):  # TODO: Push down in Telegrambot
         """Send a message to Telegram.
 
         Note: This is a private endpoint that requires authentication."""
