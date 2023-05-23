@@ -1,6 +1,6 @@
 """Base Agent implementation to add missing pieces"""
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List
 
 from steamship import Block
 from steamship.agents.base import Metadata
@@ -9,7 +9,6 @@ from steamship.agents.llm.openai import OpenAI
 from steamship.agents.planner.react import ReACTPlanner
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tool import Tool
-from steamship.experimental.package_starters.telegram_bot import TelegramBot
 from steamship.experimental.transports.chat import ChatMessage
 
 from core.personality import Personality
@@ -57,7 +56,7 @@ New input: {{input}}
 """
 
 
-class BaseAgent(AgentService, ABC):
+class BaseAgent(AgentService, ABC):  # We might decide to push this down into AgentService OR Make this part of api.py
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.planner = ReACTPlanner(
@@ -65,9 +64,6 @@ class BaseAgent(AgentService, ABC):
             llm=OpenAI(self.client),
         )
         self.planner.PROMPT = self.construct_react_prompt(self.get_personality())
-
-    def voice_tool(self) -> Optional[Tool]:
-        return None
 
     def send_message(self, blocks: List[Block], meta: Metadata):  # TODO: Push down in Telegrambot
         """Send a message to Telegram.
