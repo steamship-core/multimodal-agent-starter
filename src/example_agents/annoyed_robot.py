@@ -77,26 +77,5 @@ class MyAssistant(AgentService):
         )
         self.planner.PROMPT = SYSTEM_PROMPT
 
-    def create_response(self, context: AgentContext) -> Optional[List[Block]]:
-
-        if len(context.emit_funcs) == 0:
-            context.emit_funcs.append(self._send_message_agent)
-
-        if len(context.chat_history.messages) == 0:
-            context.chat_history.append_system_message()
-
-        self.run_agent(context)
-
-        # should we return any message to the user to indicate that a response?
-        # maybe: "Working on it..." or "Received: {prompt}..."
-        return []
-
-    def _send_message_agent(self, blocks: List[Block], meta: Metadata):
-        # should this be directly-referenced, or should this be an invoke() endpoint, with a value passed
-        # in?
-
-        print(f"\n\nTELEGRAM SENDING MESSAGES:\n{blocks}")
-        # self.telegram_transport.send(messages)
-
 if __name__ == "__main__":
-    AgentREPL(MyAssistant).run()
+    AgentREPL(MyAssistant, agent_package_config={'botToken':'not-a-real-token-for-local-testing'}).run()

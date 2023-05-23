@@ -106,4 +106,4 @@ class GoogleChatbot(AgentService):
         # self.telegram_transport.send(messages)
 
 if __name__ == "__main__":
-    AgentREPL(GoogleChatbot).run()
+    AgentREPL(GoogleChatbot, agent_package_config={'botToken':'not-a-real-token-for-local-testing'}).run()
