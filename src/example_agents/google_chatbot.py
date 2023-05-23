@@ -6,13 +6,11 @@ from steamship.agents.context.context import AgentContext
 from steamship.agents.llm.openai import OpenAI
 from steamship.agents.planner.react import ReACTPlanner
 from steamship.agents.service.agent_service import AgentService
-
 from steamship.agents.tools.image_generation.google_image_search import GoogleImageSearchTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.utils.repl import AgentREPL
 
 from core_prompt_builder import make_core_prompt
-from prompts import PROMPT
 
 
 class GoogleChatbot(AgentService):
@@ -21,6 +19,7 @@ class GoogleChatbot(AgentService):
     NOTE: To extend and deploy this agent, copy and paste the code into api.py.
 
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # The agent's planner is responsible for making decisions about what to do for a given input.
@@ -76,6 +75,7 @@ class GoogleChatbot(AgentService):
                 "You like to illustrate your responses with emojis"
             ]
         )
+
 
 if __name__ == "__main__":
     AgentREPL(GoogleChatbot).run()

@@ -6,15 +6,11 @@ from steamship.agents.context.context import AgentContext
 from steamship.agents.llm.openai import OpenAI
 from steamship.agents.planner.react import ReACTPlanner
 from steamship.agents.service.agent_service import AgentService
-
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.utils.repl import AgentREPL
 
 from core_prompt_builder import make_core_prompt
-from example_personalities.annoyed_robot import get_prompt
-from prompts import PROMPT
-
 
 
 class MyAssistant(AgentService):
@@ -72,6 +68,7 @@ class MyAssistant(AgentService):
                 "You like to illustrate your responses with emoji's",
             ]
         )
+
 
 if __name__ == "__main__":
     AgentREPL(MyAssistant).run()
