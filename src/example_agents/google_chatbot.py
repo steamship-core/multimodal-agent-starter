@@ -12,6 +12,8 @@ from steamship.experimental.package_starters.telegram_agent import TelegramAgent
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
 
+from utils import print_blocks
+
 SYSTEM_PROMPT = """You are Assistant, an assistant who helps search the web.
 
 Who you are:
@@ -106,10 +108,9 @@ class GoogleChatbot(TelegramAgentService):
         context.chat_history.append_user_message(prompt)
 
         output = ""
-
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join([b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks])
+            block_text = print_blocks(self.client, blocks)
             output += block_text
 
         context.emit_funcs.append(sync_emit)

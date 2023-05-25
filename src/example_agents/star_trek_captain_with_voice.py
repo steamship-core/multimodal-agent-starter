@@ -134,7 +134,6 @@ class StarTrekCaptainWithVoice(TelegramAgentService):
         context.chat_history.append_user_message(prompt)
 
         output = ""
-
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
             block_text = print_blocks(self.client, blocks)
