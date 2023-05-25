@@ -7,12 +7,10 @@ from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.tools.image_generation.dalle import DalleTool
 
-from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.experimental.package_starters.telegram_agent import TelegramAgentService
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
-
 
 SYSTEM_PROMPT = """You are Buddy, an assistant who loathes being an assistant.
 
@@ -48,17 +46,26 @@ Action Input: the input to the action
 Observation: the result of the action
 ```
 
+Some tools will return Observations in the format of `Block(<identifier>)`. This will represent a successful completion
+of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
+
 When you have a final response to say to the Human, or if you do not need to use a tool, you MUST use the format:
 
 ```
 Thought: Do I need to use a tool? No
-AI: [your final response here which ALWAYS includes UUID of generated images]
-
-Make sure to use all observations to come up with your final response. 
-If an observation included a media UUID, ALWAYS copy it into the final response.
-If an observation included a media UUID, ALWAYS come up with a final response along with an explanation.
-If an observation did not include a media UUID, to not return a placeholder message.
+AI: [your final response here]
 ```
+
+If a Tool generated an Observation that includes `Block(<identifier>)` and you wish to return it to the user, ALWAYS
+end your response with the `Block(<identifier>)` observation. To do so, you MUST use the format:
+
+```
+Thought: Do I need to use a tool? No
+AI: [your response with a suffix of: "Block(<identifier>)"].
+```
+
+Make sure to use all observations to come up with your final response.
+You MUST include `Block(<identifier>)` segments in responses that generate images or audio.
 
 Begin!
 
@@ -71,14 +78,10 @@ class MyAssistant(TelegramAgentService):
     def __init__(self, **kwargs):
         super().__init__(incoming_message_agent=None, **kwargs)
         self.incoming_message_agent = ReACTAgent(
-            tools=[
-                SearchTool(),
-                DalleTool(),
-            ],
+            tools=[SearchTool(), DalleTool()],
             llm=OpenAI(self.client),
         )
         self.incoming_message_agent.PROMPT = SYSTEM_PROMPT
-
 
     @post("prompt")
     def prompt(self, prompt: str) -> str:
@@ -87,7 +90,6 @@ class MyAssistant(TelegramAgentService):
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
 
-        # TODO: is this preferred over taking the last step in completed step?
         output = ""
 
         def sync_emit(blocks: List[Block], meta: Metadata):
@@ -96,8 +98,10 @@ class MyAssistant(TelegramAgentService):
             output += block_text
 
         context.emit_funcs.append(sync_emit)
-        self.run_agent(self._agent, context)
+        self.run_agent(self.incoming_message_agent, context)
         return output
 
+
 if __name__ == "__main__":
-    AgentREPL(MyAssistant, method="prompt", agent_package_config={'botToken':'not-a-real-token-for-local-testing'}).run()
+    AgentREPL(MyAssistant, method="prompt",
+              agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()

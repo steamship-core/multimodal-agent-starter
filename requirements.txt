@@ -1,2 +1,2 @@
 termcolor~=2.3.0
-steamship==2.17.0b8
+steamship==2.17.0b18
