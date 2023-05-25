@@ -105,6 +105,9 @@ class StarTrekCaptainWithVoice(TelegramAgentService):
         """Override run-agent to patch in audio generation as a finishing step for text output."""
 
         speech = GenerateSpeechTool()
+        speech.generator_plugin_config = {
+            "voice_id": "pNInz6obpgDQGcFmaJgB"  # Adam on ElevenLabs
+        }
         def to_speech_if_text(block: Block):
             nonlocal speech
             if not block.is_text():

@@ -114,3 +114,6 @@ class MyAssistant(TelegramAgentService):
 if __name__ == "__main__":
     AgentREPL(MyAssistant, method="prompt",
               agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()
+
+
+
