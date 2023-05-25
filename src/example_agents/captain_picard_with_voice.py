@@ -127,8 +127,6 @@ class StarTrekCaptainWithVoice(TelegramAgentService):
         super().run_agent(agent, context)
 
 
-    GenerateSpeechTool()
-
     @post("prompt")
     def prompt(self, prompt: str) -> str:
         """ This method is only used for handling debugging in the REPL """
