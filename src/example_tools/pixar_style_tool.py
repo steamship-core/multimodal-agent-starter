@@ -9,9 +9,9 @@ from steamship.utils.repl import ToolREPL
 
 
 class PixarStyleTool(ImageGeneratorTool):
-    """Tool to generate a Pixar-style from Stable diffusion.
+    """Tool to generate a Pixar-style image.
 
-    This example illustrates wrapping a tool with another tool.
+    This example illustrates wrapping a tool (StableDiffusionTool) with a fixed prompt template that is combined with user input.
     """
 
     name: str = "PixarStyleTool"
@@ -22,8 +22,6 @@ class PixarStyleTool(ImageGeneratorTool):
         "Input: the subject of the image "
         "Output: the Pixar-style image."
     )
-    generator_plugin_handle: str = "stable-diffusion"
-    generator_plugin_config: dict = {"n": 1}
 
     prompt_template = ("Pixar style {subject}, 4k, 8k, unreal engine, octane render photorealistic by cosmicwonder, "
         "hdr, photography by cosmicwonder, high definition, symmetrical face, volumetric lighting, dusty haze, "
