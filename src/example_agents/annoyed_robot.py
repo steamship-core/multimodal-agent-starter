@@ -5,12 +5,14 @@ from steamship import Block
 from steamship.agents.llms import OpenAI
 from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import AgentContext, Metadata
-from steamship.agents.tools.image_generation.dalle import DalleTool
 
+from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.experimental.package_starters.telegram_agent import TelegramAgentService
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
+
+from utils import print_blocks
 
 SYSTEM_PROMPT = """You are Buddy, an assistant who loathes being an assistant.
 
@@ -46,8 +48,9 @@ Action Input: the input to the action
 Observation: the result of the action
 ```
 
-Some tools will return Observations in the format of `Block(<identifier>)`. This will represent a successful completion
-of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
+Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful 
+observation of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
+`Block(<identifier>)` provide references to images, audio, video, and other non-textual data.
 
 When you have a final response to say to the Human, or if you do not need to use a tool, you MUST use the format:
 
@@ -56,19 +59,23 @@ Thought: Do I need to use a tool? No
 AI: [your final response here]
 ```
 
-If a Tool generated an Observation that includes `Block(<identifier>)` and you wish to return it to the user, ALWAYS
-end your response with the `Block(<identifier>)` observation. To do so, you MUST use the format:
+If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response, 
+end your final response with the `Block(<identifier>)`.
+
+Example:
 
 ```
+Thought: Do I need to use a tool? Yes
+Action: GenerateImageTool
+Action Input: "baboon in car"
+Observation: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
 Thought: Do I need to use a tool? No
-AI: [your response with a suffix of: "Block(<identifier>)"].
+AI: Here's that image you requested: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
 ```
 
 Make sure to use all observations to come up with your final response.
-You MUST include `Block(<identifier>)` segments in responses that generate images or audio.
 
 Begin!
-
 
 New input: {input}
 {scratchpad}"""
@@ -78,7 +85,10 @@ class MyAssistant(TelegramAgentService):
     def __init__(self, **kwargs):
         super().__init__(incoming_message_agent=None, **kwargs)
         self.incoming_message_agent = ReACTAgent(
-            tools=[SearchTool(), DalleTool()],
+            tools=[
+                SearchTool(),
+                StableDiffusionTool(),
+            ],
             llm=OpenAI(self.client),
         )
         self.incoming_message_agent.PROMPT = SYSTEM_PROMPT
@@ -91,10 +101,9 @@ class MyAssistant(TelegramAgentService):
         context.chat_history.append_user_message(prompt)
 
         output = ""
-
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join([b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks])
+            block_text = print_blocks(self.client, blocks)
             output += block_text
 
         context.emit_funcs.append(sync_emit)
@@ -105,3 +114,6 @@ class MyAssistant(TelegramAgentService):
 if __name__ == "__main__":
     AgentREPL(MyAssistant, method="prompt",
               agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()
+
+
+

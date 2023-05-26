@@ -1,6 +1,7 @@
 import logging
 import re
 import uuid
+from typing import List
 
 from steamship import Block, Steamship
 from steamship.data.workspace import SignedUrl
@@ -70,6 +71,53 @@ def _make_image_public(client, block):
     upload_to_signed_url(signed_url, block.raw())
     return read_signed_url
 
+def _make_public_url(client, block):
+    filepath = str(uuid.uuid4())
+    signed_url = (
+        client.get_workspace()
+        .create_signed_url(
+            SignedUrl.Request(
+                bucket=SignedUrl.Bucket.PLUGIN_DATA,
+                filepath=filepath,
+                operation=SignedUrl.Operation.WRITE,
+            )
+        )
+        .signed_url
+    )
+    logging.info(f"Got signed url for uploading block content: {signed_url}")
+    read_signed_url = (
+        client.get_workspace()
+        .create_signed_url(
+            SignedUrl.Request(
+                bucket=SignedUrl.Bucket.PLUGIN_DATA,
+                filepath=filepath,
+                operation=SignedUrl.Operation.READ,
+            )
+        )
+        .signed_url
+    )
+    upload_to_signed_url(signed_url, block.raw())
+    return read_signed_url
+
+def print_blocks(client: Steamship, blocks: List[Block]) -> str:
+    """Print a list of blocks to console."""
+    output = None
+
+    for block in blocks:
+        if isinstance(block, dict):
+            block = Block.parse_obj(block)
+        if block.is_text():
+            output = block.text
+        elif block.url:
+            output = block.url
+        elif block.content_url:
+            output = block.content_url
+        else:
+            url = _make_public_url(client, block)
+            output = url
+
+    if output:
+        return output
 
 class LoggingDisabled:
     """Context manager that turns off logging within context."""
