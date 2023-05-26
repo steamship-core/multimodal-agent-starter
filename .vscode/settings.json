@@ -1,0 +1,3 @@
+{
+  "python.venvPath": "${workspaceRoot}/.vent/bin/python3.8",
+}
