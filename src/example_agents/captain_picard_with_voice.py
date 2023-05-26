@@ -8,7 +8,7 @@ from steamship.agents.schema import AgentContext, Metadata, Action, FinishAction
 from steamship.agents.llms import OpenAI
 from steamship.agents.react import ReACTAgent
 
-from steamship.agents.tools.image_generation.google_image_search import GoogleImageSearchTool
+from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.tools.speech_generation.generate_speech import GenerateSpeechTool
 from steamship.experimental.package_starters.telegram_agent import TelegramAgentService
@@ -94,7 +94,7 @@ class StarTrekCaptainWithVoice(TelegramAgentService):
         # The agent's planner is responsible for making decisions about what to do for a given input.
         self.incoming_message_agent = ReACTAgent(
             tools=[
-                GoogleImageSearchTool(),
+                StableDiffusionTool(),
             ],
             llm=OpenAI(self.client),
         )
