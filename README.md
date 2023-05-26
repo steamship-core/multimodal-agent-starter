@@ -1,5 +1,7 @@
 # AI Podcaster
 
+![AI Podcaster](https://edwardbenson.com/images/lollm.png)
+
 [![Open in a VS Code Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/eob/ai-podcaster)
 
 A cloud-deployable project to generate a podcast 100% with AI. Based on the [Multimodal Agent Starter](https://steamship.com/learn/agent-guidebook) repo.
