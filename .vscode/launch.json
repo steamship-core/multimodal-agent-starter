@@ -5,7 +5,7 @@
       "name": "Run",
       "type": "python",
       "request": "launch",
-      "program": "${workspaceRoot}/main.py",
+      "program": "${workspaceRoot}/src/api.py",
       "console": "integratedTerminal",
       "justMyCode": true,
       "env": {
