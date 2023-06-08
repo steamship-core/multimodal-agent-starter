@@ -89,7 +89,7 @@ class ExampleDocumentQAService(AgentService):
             llm=OpenAI(self.client),
         )
 
-        # This Mixin provides HTTP endpoints that
+        # This Mixin provides HTTP endpoints that connects this agent to a web client
         self.add_mixin(
             SteamshipWidgetTransport(
                 client=self.client, agent_service=self, agent=self._agent

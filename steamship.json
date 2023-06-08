@@ -1,7 +1,7 @@
 {
 	"type": "package",
-	"handle": "",
-	"version": "0.0.1",
+	"handle": "ted-test-test-bot",
+	"version": "0.0.1-rc.4",
 	"description": "",
 	"author": "",
 	"entrypoint": "Unused",
@@ -13,13 +13,7 @@
 			"examples"
 		]
 	},
-	"configTemplate": {
-		"telegram_token": {
-			"type": "string",
-			"description": "The secret token for your Telegram bot",
-			"default": ""
-		}
-	},
+	"configTemplate": {},
 	"steamshipRegistry": {
 		"tagline": "",
 		"tagline2": null,

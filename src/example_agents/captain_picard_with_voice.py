@@ -4,14 +4,23 @@ from typing import List
 
 from steamship import Block, Task, SteamshipError
 from steamship.agents.logging import AgentLogging
-from steamship.agents.schema import AgentContext, Metadata, Action, FinishAction, Agent, EmitFunc
+from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
+from steamship.agents.schema import (
+    AgentContext,
+    Metadata,
+    Action,
+    FinishAction,
+    Agent,
+    EmitFunc,
+)
 from steamship.agents.llms import OpenAI
 from steamship.agents.react import ReACTAgent
+from steamship.agents.service.agent_service import AgentService
 
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.tools.speech_generation.generate_speech import GenerateSpeechTool
-from steamship.experimental.package_starters.telegram_agent import TelegramAgentService
+from steamship.agents.utils import with_llm
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
 
@@ -83,23 +92,30 @@ New input: {input}
 {scratchpad}"""
 
 
-class StarTrekCaptainWithVoice(TelegramAgentService):
+class StarTrekCaptainWithVoice(AgentService):
     """Deployable Multimodal Agent that illustrates a character personality with voice.
 
     NOTE: To extend and deploy this agent, copy and paste the code into api.py.
     """
 
     def __init__(self, **kwargs):
-        super().__init__(incoming_message_agent=None, **kwargs)
+        super().__init__(**kwargs)
+
         # The agent's planner is responsible for making decisions about what to do for a given input.
-        self.incoming_message_agent = ReACTAgent(
+        self._agent = ReACTAgent(
             tools=[
                 StableDiffusionTool(),
             ],
             llm=OpenAI(self.client),
         )
-        self.incoming_message_agent.PROMPT = SYSTEM_PROMPT
+        self._agent.PROMPT = SYSTEM_PROMPT
 
+        # This Mixin provides HTTP endpoints that connects this agent to a web client
+        self.add_mixin(
+            SteamshipWidgetTransport(
+                client=self.client, agent_service=self, agent=self._agent
+            )
+        )
 
     def run_agent(self, agent: Agent, context: AgentContext):
         """Override run-agent to patch in audio generation as a finishing step for text output."""
@@ -108,6 +124,7 @@ class StarTrekCaptainWithVoice(TelegramAgentService):
         speech.generator_plugin_config = {
             "voice_id": "pNInz6obpgDQGcFmaJgB"  # Adam on ElevenLabs
         }
+
         def to_speech_if_text(block: Block):
             nonlocal speech
             if not block.is_text():
@@ -121,31 +138,50 @@ class StarTrekCaptainWithVoice(TelegramAgentService):
             def wrapper(blocks: List[Block], metadata: Metadata):
                 blocks = [to_speech_if_text(block) for block in blocks]
                 return emit_func(blocks, metadata)
+
             return wrapper
 
         context.emit_funcs = [wrap_emit(emit_func) for emit_func in context.emit_funcs]
         super().run_agent(agent, context)
 
-
     @post("prompt")
     def prompt(self, prompt: str) -> str:
-        """ This method is only used for handling debugging in the REPL """
+        """Run an agent with the provided text as the input."""
+
+        # AgentContexts serve to allow the AgentService to run agents
+        # with appropriate information about the desired tasking.
+        # Here, we create a new context on each prompt, and append the
+        # prompt to the message history stored in the context.
         context_id = uuid.uuid4()
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
+        # Add the LLM
+        context = with_llm(context=context, llm=OpenAI(client=self.client))
 
+        # AgentServices provide an emit function hook to access the output of running
+        # agents and tools. The emit functions fire at after the supplied agent emits
+        # a "FinishAction".
+        #
+        # Here, we show one way of accessing the output in a synchronous fashion. An
+        # alternative way would be to access the final Action in the `context.completed_steps`
+        # after the call to `run_agent()`.
         output = ""
+
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = print_blocks(self.client, blocks)
+            block_text = "\n".join(
+                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
+            )
             output += block_text
 
         context.emit_funcs.append(sync_emit)
-        self.run_agent(self.incoming_message_agent, context)
+        self.run_agent(self._agent, context)
         return output
 
 
 if __name__ == "__main__":
-    AgentREPL(StarTrekCaptainWithVoice,
-              method="prompt",
-              agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()
+    AgentREPL(
+        StarTrekCaptainWithVoice,
+        method="prompt",
+        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+    ).run()
