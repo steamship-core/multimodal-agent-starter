@@ -25,10 +25,9 @@ class ReACTAgentThatAlwaysUsesToolOutput(ReACTAgent):
         """
         if context.completed_steps and len(context.completed_steps):
             last_step = context.completed_steps[-1]
-            return FinishAction(
-                output=last_step.output, context=context
-            )
+            return FinishAction(output=last_step.output, context=context)
         return super().next_action(context)
+
 
 class ExampleDocumentQAService(AgentService):
     """ExampleDocumentQAService is an example bot you can deploy for PDF and Video Q&A.  # noqa: RST201
@@ -52,6 +51,7 @@ class ExampleDocumentQAService(AgentService):
     This agent provides a starter project for special purpose QA agents that can answer questions about documents
     you provide.
     """
+
     indexer_mixin: IndexerPipelineMixin
 
     def __init__(self, **kwargs):
@@ -78,7 +78,7 @@ class ExampleDocumentQAService(AgentService):
         self._agent = ReACTAgentThatAlwaysUsesToolOutput(
             tools=[
                 VectorSearchQATool(
-                    agent_description = (
+                    agent_description=(
                         "Used to answer questions. "
                         "Whenever the input is a question, ALWAYS use this tool. "
                         "The input is the question. "
@@ -91,7 +91,9 @@ class ExampleDocumentQAService(AgentService):
 
         # This Mixin provides HTTP endpoints that connects this agent to a web client
         self.add_mixin(
-            SteamshipWidgetTransport(client=self.client, agent_service=self, agent=self._agent)
+            SteamshipWidgetTransport(
+                client=self.client, agent_service=self, agent=self._agent
+            )
         )
 
     @post("/index_url")
@@ -102,8 +104,9 @@ class ExampleDocumentQAService(AgentService):
         index_handle: Optional[str] = None,
         mime_type: Optional[str] = None,
     ) -> Task:
-       return self.indexer_mixin.index_url(url=url, metadata=metadata, index_handle=index_handle, mime_type=mime_type)
-
+        return self.indexer_mixin.index_url(
+            url=url, metadata=metadata, index_handle=index_handle, mime_type=mime_type
+        )
 
     @post("prompt")
     def prompt(self, prompt: str) -> str:

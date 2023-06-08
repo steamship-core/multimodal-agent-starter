@@ -5,7 +5,14 @@ from typing import List
 from steamship import Block, Task, SteamshipError
 from steamship.agents.logging import AgentLogging
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.schema import AgentContext, Metadata, Action, FinishAction, Agent, EmitFunc
+from steamship.agents.schema import (
+    AgentContext,
+    Metadata,
+    Action,
+    FinishAction,
+    Agent,
+    EmitFunc,
+)
 from steamship.agents.llms import OpenAI
 from steamship.agents.react import ReACTAgent
 from steamship.agents.service.agent_service import AgentService
@@ -105,9 +112,10 @@ class StarTrekCaptainWithVoice(AgentService):
 
         # This Mixin provides HTTP endpoints that connects this agent to a web client
         self.add_mixin(
-            SteamshipWidgetTransport(client=self.client, agent_service=self, agent=self._agent)
+            SteamshipWidgetTransport(
+                client=self.client, agent_service=self, agent=self._agent
+            )
         )
-
 
     def run_agent(self, agent: Agent, context: AgentContext):
         """Override run-agent to patch in audio generation as a finishing step for text output."""
@@ -116,6 +124,7 @@ class StarTrekCaptainWithVoice(AgentService):
         speech.generator_plugin_config = {
             "voice_id": "pNInz6obpgDQGcFmaJgB"  # Adam on ElevenLabs
         }
+
         def to_speech_if_text(block: Block):
             nonlocal speech
             if not block.is_text():
@@ -129,11 +138,11 @@ class StarTrekCaptainWithVoice(AgentService):
             def wrapper(blocks: List[Block], metadata: Metadata):
                 blocks = [to_speech_if_text(block) for block in blocks]
                 return emit_func(blocks, metadata)
+
             return wrapper
 
         context.emit_funcs = [wrap_emit(emit_func) for emit_func in context.emit_funcs]
         super().run_agent(agent, context)
-
 
     @post("prompt")
     def prompt(self, prompt: str) -> str:
@@ -171,6 +180,8 @@ class StarTrekCaptainWithVoice(AgentService):
 
 
 if __name__ == "__main__":
-    AgentREPL(StarTrekCaptainWithVoice,
-              method="prompt",
-              agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()
+    AgentREPL(
+        StarTrekCaptainWithVoice,
+        method="prompt",
+        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+    ).run()

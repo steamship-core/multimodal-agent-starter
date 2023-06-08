@@ -71,6 +71,7 @@ def _make_image_public(client, block):
     upload_to_signed_url(signed_url, block.raw())
     return read_signed_url
 
+
 def _make_public_url(client, block):
     filepath = str(uuid.uuid4())
     signed_url = (
@@ -99,6 +100,7 @@ def _make_public_url(client, block):
     upload_to_signed_url(signed_url, block.raw())
     return read_signed_url
 
+
 def print_blocks(client: Steamship, blocks: List[Block]) -> str:
     """Print a list of blocks to console."""
     output = None
@@ -118,6 +120,7 @@ def print_blocks(client: Steamship, blocks: List[Block]) -> str:
 
     if output:
         return output
+
 
 class LoggingDisabled:
     """Context manager that turns off logging within context."""

@@ -98,7 +98,9 @@ class MyAssistant(AgentService):
 
         # This Mixin provides HTTP endpoints that connects this agent to a web client
         self.add_mixin(
-            SteamshipWidgetTransport(client=self.client, agent_service=self, agent=self._agent)
+            SteamshipWidgetTransport(
+                client=self.client, agent_service=self, agent=self._agent
+            )
         )
 
     @post("prompt")
@@ -137,8 +139,8 @@ class MyAssistant(AgentService):
 
 
 if __name__ == "__main__":
-    AgentREPL(MyAssistant, method="prompt",
-              agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()
-
-
-
+    AgentREPL(
+        MyAssistant,
+        method="prompt",
+        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+    ).run()

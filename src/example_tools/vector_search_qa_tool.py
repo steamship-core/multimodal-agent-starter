@@ -4,7 +4,9 @@ from typing import Any, List, Optional, Union
 from steamship import Block, Tag, Task
 from steamship.agents.llms import OpenAI
 from steamship.agents.schema import AgentContext
-from steamship.agents.tools.question_answering.vector_search_tool import VectorSearchTool
+from steamship.agents.tools.question_answering.vector_search_tool import (
+    VectorSearchTool,
+)
 from steamship.agents.utils import get_llm, with_llm
 from steamship.utils.repl import ToolREPL
 
@@ -50,7 +52,11 @@ class VectorSearchQATool(VectorSearchTool):
                 source_texts.append(self.source_document_prompt.format(**item_data))
 
         if not source_texts:
-            return [Block(text="Sorry, I didn't find anything in my document memory related to this question.")]
+            return [
+                Block(
+                    text="Sorry, I didn't find anything in my document memory related to this question."
+                )
+            ]
 
         final_prompt = self.question_answering_prompt.format(
             **{"source_text": "\n".join(source_texts), "question": question}
@@ -58,7 +64,9 @@ class VectorSearchQATool(VectorSearchTool):
 
         return get_llm(context).complete(prompt=final_prompt)
 
-    def run(self, tool_input: List[Block], context: AgentContext) -> Union[List[Block], Task[Any]]:
+    def run(
+        self, tool_input: List[Block], context: AgentContext
+    ) -> Union[List[Block], Task[Any]]:
         """Answers questions with the assistance of an Embedding Index plugin.
 
         Inputs
@@ -89,7 +97,9 @@ if __name__ == "__main__":
 
     with repl.temporary_workspace() as client:
         index = tool.get_embedding_index(client)
-        index.insert([Tag(text="Ted loves apple pie."), Tag(text="The secret passcode is 1234.")])
+        index.insert(
+            [Tag(text="Ted loves apple pie."), Tag(text="The secret passcode is 1234.")]
+        )
         repl.run_with_client(
             client, context=with_llm(context=AgentContext(), llm=OpenAI(client=client))
         )

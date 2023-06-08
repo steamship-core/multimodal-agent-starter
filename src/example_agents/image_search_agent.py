@@ -8,7 +8,9 @@ from steamship.agents.llms import OpenAI
 from steamship.agents.react import ReACTAgent
 from steamship.agents.service.agent_service import AgentService
 
-from steamship.agents.tools.image_generation.google_image_search import GoogleImageSearchTool
+from steamship.agents.tools.image_generation.google_image_search import (
+    GoogleImageSearchTool,
+)
 from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.utils import with_llm
 from steamship.invocable import post
@@ -95,17 +97,16 @@ class ImageSearchBot(AgentService):
 
         # The agent's planner is responsible for making decisions about what to do for a given input.
         self._agent = ReACTAgent(
-            tools=[
-                SearchTool(),
-                GoogleImageSearchTool()
-            ],
+            tools=[SearchTool(), GoogleImageSearchTool()],
             llm=OpenAI(self.client),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
 
         # This Mixin provides HTTP endpoints that connects this agent to a web client
         self.add_mixin(
-            SteamshipWidgetTransport(client=self.client, agent_service=self, agent=self._agent)
+            SteamshipWidgetTransport(
+                client=self.client, agent_service=self, agent=self._agent
+            )
         )
 
     @post("prompt")
@@ -144,6 +145,8 @@ class ImageSearchBot(AgentService):
 
 
 if __name__ == "__main__":
-    AgentREPL(ImageSearchBot,
-              method="prompt",
-              agent_package_config={'botToken': 'not-a-real-token-for-local-testing'}).run()
+    AgentREPL(
+        ImageSearchBot,
+        method="prompt",
+        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+    ).run()
