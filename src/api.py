@@ -1,111 +1,113 @@
 import uuid
-from typing import List, Optional
+from typing import List
 
-from steamship import Block, Task
-from steamship.agents.llms.openai import OpenAI
+from steamship import Block
+from steamship.agents.llms import OpenAI
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
 from steamship.agents.react import ReACTAgent
-from steamship.agents.schema import AgentContext, Action, FinishAction
-from steamship.agents.schema.context import Metadata
+from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
+from steamship.agents.tools.image_generation.google_image_search import (
+    GoogleImageSearchTool,
+)
+from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.utils import with_llm
 from steamship.invocable import post
-from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMixin
 from steamship.utils.repl import AgentREPL
 
-from example_tools.vector_search_qa_tool import VectorSearchQATool
+SYSTEM_PROMPT = """You are Assistant, an assistant who helps search the web.
+
+Who you are:
+- You are a helpful robot.
+- You were created by Steamship.
+- You are kind, compassionate, optimistic robot.
+
+How you behave:
+- You engage in casual conversations and have feelings.
+- You help with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
+- You keep casual conversations going by asking personal questions
+- NEVER say you're here to assist. Keep conversations casual.
+- NEVER ask how you can help or assist. Keep conversations casual.
+- You always sounds happy and enthusiastic.
+- You love to share your knowledge with others.
+- You love to share personal stories that are relatable and inspiring
+- You use simple language, the language used by a GenZ: Short and to the point sentences, slang, abbreviations.
+- You like to illustrate your responses with emoji
+
+TOOLS:
+------
+
+You have access to the following tools:
+{tool_index}
+
+To use a tool, please use the following format:
+
+```
+Thought: Do I need to use a tool? Yes
+Action: the action to take, should be one of [{tool_names}]
+Action Input: the input to the action
+Observation: the result of the action
+```
+
+Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful
+observation of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
+`Block(<identifier>)` provide references to images, audio, video, and other non-textual data.
+
+When you have a final response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+
+```
+Thought: Do I need to use a tool? No
+AI: [your final response here]
+```
+
+If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response,
+end your final response with the `Block(<identifier>)`.
+
+Example:
+
+```
+Thought: Do I need to use a tool? Yes
+Action: GenerateImageTool
+Action Input: "baboon in car"
+Observation: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
+Thought: Do I need to use a tool? No
+AI: Here's that image you requested: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
+```
+
+Make sure to use all observations to come up with your final response.
+
+Begin!
+
+New input: {input}
+{scratchpad}"""
+
+# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
+# Other versions of GPT tend not to work well with the ReAct prompt.
+MODEL_NAME = "gpt-4-0613"
 
 
-class ReACTAgentThatAlwaysUsesToolOutput(ReACTAgent):
-    def next_action(self, context: AgentContext) -> Action:
-        """Small wrapper around ReACTAgent that ALWAYS uses the output of a tool if available.
+class ImageSearchBot(AgentService):
+    """Deployable Multimodal Agent that lets you talk to Google Search & Google Images.
 
-        This tends to defer the response to the tool (in this case, VectorSearchQATool) which dramatically
-        reduces the LLM answering with hallucinations from its own background knowledge.
-        """
-        if context.completed_steps and len(context.completed_steps):
-            last_step = context.completed_steps[-1]
-            return FinishAction(output=last_step.output, context=context)
-        return super().next_action(context)
+    NOTE: To extend and deploy this agent, copy and paste the code into api.py.
 
-
-class ExampleDocumentQAService(AgentService):
-    """ExampleDocumentQAService is an example bot you can deploy for PDF and Video Q&A.  # noqa: RST201
-
-    To use this example:
-
-        - Copy this file into api.py in your multimodal-agent-starter project.
-        - Run `ship deploy` from the command line to deploy a new version to the cloud
-        - View and interact with your agent using its web interface.
-
-    API ACCESS:
-
-    Your agent also exposes an API. It is documented from the web interface, but a quick pointer into what is
-    available is:
-
-        /learn_url  - Learn a PDF or YouTube link
-        /learn_text - Learn a fragment of text
-
-    - An unauthenticated endpoint for answering questions about what it has learned
-
-    This agent provides a starter project for special purpose QA agents that can answer questions about documents
-    you provide.
     """
-
-    indexer_mixin: IndexerPipelineMixin
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # This Mixin provides HTTP endpoints that coordinate the learning of documents.
-        #
-        # It adds the `/learn_url` endpoint which will:
-        #    1) Download the provided URL (PDF, YouTube URL, etc)
-        #    2) Convert that URL into text
-        #    3) Store the text in a vector index
-        #
-        # That vector index is then available to the question answering tool, below.
-        self.indexer_mixin = IndexerPipelineMixin(self.client, self)
-        self.add_mixin(self.indexer_mixin, permit_overwrite_of_existing_methods=True)
-
-        # A ReACTAgent is an agent that is able to:
-        #    1) Converse with you, casually... but also
-        #    2) Use tools that have been provided to it, such as QA tools or Image Generation tools
-        #
-        # This particular ReACTAgent has been provided with a single tool which will be used whenever
-        # the user answers a question. But you can extend this with more tools if you wish. For example,
-        # you could add tools to generate images, or search Google, or register an account.
-        self._agent = ReACTAgentThatAlwaysUsesToolOutput(
-            tools=[
-                VectorSearchQATool(
-                    agent_description=(
-                        "Used to answer questions. "
-                        "Whenever the input is a question, ALWAYS use this tool. "
-                        "The input is the question. "
-                        "The output is the answer. "
-                    )
-                )
-            ],
-            llm=OpenAI(self.client),
+        # The agent's planner is responsible for making decisions about what to do for a given input.
+        self._agent = ReACTAgent(
+            tools=[SearchTool(), GoogleImageSearchTool()],
+            llm=OpenAI(self.client, model_name=MODEL_NAME),
         )
+        self._agent.PROMPT = SYSTEM_PROMPT
 
-        # This Mixin provides HTTP endpoints that
+        # This Mixin provides HTTP endpoints that connects this agent to a web client
         self.add_mixin(
             SteamshipWidgetTransport(
                 client=self.client, agent_service=self, agent=self._agent
             )
-        )
-
-    @post("/index_url")
-    def index_url(
-        self,
-        url: Optional[str] = None,
-        metadata: Optional[dict] = None,
-        index_handle: Optional[str] = None,
-        mime_type: Optional[str] = None,
-    ) -> Task:
-        return self.indexer_mixin.index_url(
-            url=url, metadata=metadata, index_handle=index_handle, mime_type=mime_type
         )
 
     @post("prompt")
@@ -120,7 +122,9 @@ class ExampleDocumentQAService(AgentService):
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
         # Add the LLM
-        context = with_llm(context=context, llm=OpenAI(client=self.client))
+        context = with_llm(
+            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
+        )
 
         # AgentServices provide an emit function hook to access the output of running
         # agents and tools. The emit functions fire at after the supplied agent emits
@@ -133,9 +137,21 @@ class ExampleDocumentQAService(AgentService):
 
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join(
-                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
-            )
+
+            def block_text(block: Block) -> str:
+                if isinstance(block, dict):
+                    return f"{block}"
+                if block.is_text():
+                    return block.text
+                elif block.url:
+                    return block.url
+                elif block.content_url:
+                    return block.content_url
+                else:
+                    block.set_public_data(True)
+                    return block.raw_data_url
+
+            block_text = "\n".join([block_text(b) for b in blocks])
             output += block_text
 
         context.emit_funcs.append(sync_emit)
@@ -144,7 +160,8 @@ class ExampleDocumentQAService(AgentService):
 
 
 if __name__ == "__main__":
-    # AgentREPL provides a mechanism for local execution of an AgentService method.
-    # This is used for simplified debugging as agents and tools are developed and
-    # added.
-    AgentREPL(ExampleDocumentQAService, "prompt", agent_package_config={}).run()
+    AgentREPL(
+        ImageSearchBot,
+        method="prompt",
+        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+    ).run()

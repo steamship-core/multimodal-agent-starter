@@ -5,7 +5,7 @@ from steamship import Block, Task
 from steamship.agents.llms.openai import OpenAI
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
 from steamship.agents.react import ReACTAgent
-from steamship.agents.schema import AgentContext, Action, FinishAction
+from steamship.agents.schema import Action, AgentContext, FinishAction
 from steamship.agents.schema.context import Metadata
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.utils import with_llm
@@ -14,6 +14,10 @@ from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMix
 from steamship.utils.repl import AgentREPL
 
 from example_tools.vector_search_qa_tool import VectorSearchQATool
+
+# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
+# Other versions of GPT tend not to work well with the ReAct prompt.
+MODEL_NAME = "gpt-4-0613"
 
 
 class ReACTAgentThatAlwaysUsesToolOutput(ReACTAgent):
@@ -86,7 +90,7 @@ class ExampleDocumentQAService(AgentService):
                     )
                 )
             ],
-            llm=OpenAI(self.client),
+            llm=OpenAI(self.client, model_name=MODEL_NAME),
         )
 
         # This Mixin provides HTTP endpoints that connects this agent to a web client
@@ -120,7 +124,9 @@ class ExampleDocumentQAService(AgentService):
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
         # Add the LLM
-        context = with_llm(context=context, llm=OpenAI(client=self.client))
+        context = with_llm(
+            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
+        )
 
         # AgentServices provide an emit function hook to access the output of running
         # agents and tools. The emit functions fire at after the supplied agent emits
@@ -133,9 +139,21 @@ class ExampleDocumentQAService(AgentService):
 
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join(
-                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
-            )
+
+            def block_text(block: Block) -> str:
+                if isinstance(block, dict):
+                    return f"{block}"
+                if block.is_text():
+                    return block.text
+                elif block.url:
+                    return block.url
+                elif block.content_url:
+                    return block.content_url
+                else:
+                    block.set_public_data(True)
+                    return block.raw_data_url
+
+            block_text = "\n".join([block_text(b) for b in blocks])
             output += block_text
 
         context.emit_funcs.append(sync_emit)

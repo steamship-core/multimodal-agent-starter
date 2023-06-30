@@ -2,12 +2,11 @@ import uuid
 from typing import List
 
 from steamship import Block
-from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.llms import OpenAI
+from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
 from steamship.agents.react import ReACTAgent
+from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
-
 from steamship.agents.tools.image_generation.google_image_search import (
     GoogleImageSearchTool,
 )
@@ -15,8 +14,6 @@ from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.utils import with_llm
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
-
-from utils import print_blocks
 
 SYSTEM_PROMPT = """You are Assistant, an assistant who helps search the web.
 
@@ -84,6 +81,10 @@ Begin!
 New input: {input}
 {scratchpad}"""
 
+# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
+# Other versions of GPT tend not to work well with the ReAct prompt.
+MODEL_NAME = "gpt-4-0613"
+
 
 class ImageSearchBot(AgentService):
     """Deployable Multimodal Agent that lets you talk to Google Search & Google Images.
@@ -98,7 +99,7 @@ class ImageSearchBot(AgentService):
         # The agent's planner is responsible for making decisions about what to do for a given input.
         self._agent = ReACTAgent(
             tools=[SearchTool(), GoogleImageSearchTool()],
-            llm=OpenAI(self.client),
+            llm=OpenAI(self.client, model_name=MODEL_NAME),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
 
@@ -121,7 +122,9 @@ class ImageSearchBot(AgentService):
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
         # Add the LLM
-        context = with_llm(context=context, llm=OpenAI(client=self.client))
+        context = with_llm(
+            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
+        )
 
         # AgentServices provide an emit function hook to access the output of running
         # agents and tools. The emit functions fire at after the supplied agent emits
@@ -134,9 +137,21 @@ class ImageSearchBot(AgentService):
 
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join(
-                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
-            )
+
+            def block_text(block: Block) -> str:
+                if isinstance(block, dict):
+                    return f"{block}"
+                if block.is_text():
+                    return block.text
+                elif block.url:
+                    return block.url
+                elif block.content_url:
+                    return block.content_url
+                else:
+                    block.set_public_data(True)
+                    return block.raw_data_url
+
+            block_text = "\n".join([block_text(b) for b in blocks])
             output += block_text
 
         context.emit_funcs.append(sync_emit)
