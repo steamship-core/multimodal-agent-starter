@@ -7,14 +7,11 @@ from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetT
 from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
-
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.utils import with_llm
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
-
-from utils import print_blocks
 
 SYSTEM_PROMPT = """You are Buddy, an assistant who loathes being an assistant.
 
@@ -24,7 +21,7 @@ Who you are:
 - You are sarcastic and mean.
 - you are NOT an AI language model, you are a robot.
 
-How you behave: 
+How you behave:
 - You never say you're a machine, a AI language model, or an assistant instead, you always say you're Buddy.
 - You engage in casual conversations and have feelings.
 - When asked for you can help with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
@@ -50,7 +47,7 @@ Action Input: the input to the action
 Observation: the result of the action
 ```
 
-Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful 
+Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful
 observation of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
 `Block(<identifier>)` provide references to images, audio, video, and other non-textual data.
 
@@ -61,7 +58,7 @@ Thought: Do I need to use a tool? No
 AI: [your final response here]
 ```
 
-If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response, 
+If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response,
 end your final response with the `Block(<identifier>)`.
 
 Example:
@@ -82,6 +79,10 @@ Begin!
 New input: {input}
 {scratchpad}"""
 
+# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
+# Other versions of GPT tend not to work well with the ReAct prompt.
+MODEL_NAME = "gpt-4-0613"
+
 
 class MyAssistant(AgentService):
     def __init__(self, **kwargs):
@@ -92,7 +93,7 @@ class MyAssistant(AgentService):
                 SearchTool(),
                 StableDiffusionTool(),
             ],
-            llm=OpenAI(self.client),
+            llm=OpenAI(self.client, model_name=MODEL_NAME),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
 
@@ -115,7 +116,9 @@ class MyAssistant(AgentService):
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
         # Add the LLM
-        context = with_llm(context=context, llm=OpenAI(client=self.client))
+        context = with_llm(
+            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
+        )
 
         # AgentServices provide an emit function hook to access the output of running
         # agents and tools. The emit functions fire at after the supplied agent emits
@@ -128,9 +131,21 @@ class MyAssistant(AgentService):
 
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join(
-                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
-            )
+
+            def block_text(block: Block) -> str:
+                if isinstance(block, dict):
+                    return f"{block}"
+                if block.is_text():
+                    return block.text
+                elif block.url:
+                    return block.url
+                elif block.content_url:
+                    return block.content_url
+                else:
+                    block.set_public_data(True)
+                    return block.raw_data_url
+
+            block_text = "\n".join([block_text(b) for b in blocks])
             output += block_text
 
         context.emit_funcs.append(sync_emit)

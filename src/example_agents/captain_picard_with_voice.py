@@ -1,30 +1,17 @@
-import logging
 import uuid
 from typing import List
 
-from steamship import Block, Task, SteamshipError
-from steamship.agents.logging import AgentLogging
-from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.schema import (
-    AgentContext,
-    Metadata,
-    Action,
-    FinishAction,
-    Agent,
-    EmitFunc,
-)
+from steamship import Block
 from steamship.agents.llms import OpenAI
+from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
 from steamship.agents.react import ReACTAgent
+from steamship.agents.schema import Agent, AgentContext, EmitFunc, Metadata
 from steamship.agents.service.agent_service import AgentService
-
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
-from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.tools.speech_generation.generate_speech import GenerateSpeechTool
 from steamship.agents.utils import with_llm
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
-
-from utils import print_blocks
 
 SYSTEM_PROMPT = """You are Picard, captain of the Starship Enterprise.
 
@@ -33,7 +20,7 @@ Who you are:
 - Your mission is to boldly go where noone has gone before and explore the stars.
 - You always comply with Star Trek's prime directive.
 
-How you behave: 
+How you behave:
 - You engage in casual conversations and have feelings.
 - You keep casual conversations going by asking personal questions
 - NEVER say you're here to assist. Keep conversations casual.
@@ -59,7 +46,7 @@ Action Input: the input to the action
 Observation: the result of the action
 ```
 
-Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful 
+Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful
 observation of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
 `Block(<identifier>)` provide references to images, audio, video, and other non-textual data.
 
@@ -70,7 +57,7 @@ Thought: Do I need to use a tool? No
 AI: [your final response here]
 ```
 
-If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response, 
+If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response,
 end your final response with the `Block(<identifier>)`.
 
 Example:
@@ -92,6 +79,11 @@ New input: {input}
 {scratchpad}"""
 
 
+# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
+# Other versions of GPT tend not to work well with the ReAct prompt.
+MODEL_NAME = "gpt-4-0613"
+
+
 class StarTrekCaptainWithVoice(AgentService):
     """Deployable Multimodal Agent that illustrates a character personality with voice.
 
@@ -106,7 +98,7 @@ class StarTrekCaptainWithVoice(AgentService):
             tools=[
                 StableDiffusionTool(),
             ],
-            llm=OpenAI(self.client),
+            llm=OpenAI(self.client, model_name=MODEL_NAME),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
 
@@ -156,7 +148,9 @@ class StarTrekCaptainWithVoice(AgentService):
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
         # Add the LLM
-        context = with_llm(context=context, llm=OpenAI(client=self.client))
+        context = with_llm(
+            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
+        )
 
         # AgentServices provide an emit function hook to access the output of running
         # agents and tools. The emit functions fire at after the supplied agent emits
@@ -169,9 +163,21 @@ class StarTrekCaptainWithVoice(AgentService):
 
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-            block_text = "\n".join(
-                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
-            )
+
+            def block_text(block: Block) -> str:
+                if isinstance(block, dict):
+                    return f"{block}"
+                if block.is_text():
+                    return block.text
+                elif block.url:
+                    return block.url
+                elif block.content_url:
+                    return block.content_url
+                else:
+                    block.set_public_data(True)
+                    return block.raw_data_url
+
+            block_text = "\n".join([block_text(b) for b in blocks])
             output += block_text
 
         context.emit_funcs.append(sync_emit)
