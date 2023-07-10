@@ -38,6 +38,15 @@ With the proper Python environment set up and your `STEAMSHIP_API_KEY` environme
 PYTHONPATH=src python3.8 src/api.py
 ```
 
+## Modifying your agent
+
+Modify your agent by editing `src/api.py`. 
+You can:
+
+- Change its personality (edit the SYSTEM_PROMPT)
+- Add tools, allowing your agent's reasoning process to do new things (see tool list below)
+- Add mixins, allowing your agent to connect to different channels (see mixin list below)
+
 ## Deploying your agent
 
 [A full guide to deploying is here](https://steamship.com/learn/agent-guidebook/deploying/deploy-your-agent).
@@ -85,4 +94,14 @@ And you can import or find more open source tools in the [Steamship SDK](https:/
 * Conversation Starters:
   * [Knock-Knock Joke Starter](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/tools/conversation_starters/knock_knock_tool.py) - Initiate a knock knock joke. The world's most useful tool.
 
-    
+## What Mixins can I use with my agent?
+
+Mixins provide additional API endpoints to your agent, which can connect your agent to a communication channel like Telegram, or provide additional data loading functionality.
+
+Several mixins are provided out of the box in the Steamship SDK:
+
+* Transports (Communication Channels)
+  * [Steamship Web Widget](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/steamship_widget.py) - For testing your agent in the Web UI
+  * [Telegram](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/telegram.py) - for communicating with your agent in Telegram
+* Data Loading
+  * [Indexer Pipeline](https://github.com/steamship-core/python-client/blob/main/src/steamship/invocable/mixins/indexer_pipeline_mixin.py) - For loading documents into your agent's question-answer ability

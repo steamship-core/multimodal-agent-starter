@@ -163,5 +163,5 @@ if __name__ == "__main__":
     AgentREPL(
         ImageSearchBot,
         method="prompt",
-        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+        agent_package_config={},
     ).run()
