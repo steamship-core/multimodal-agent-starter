@@ -2,9 +2,10 @@ import uuid
 from typing import List
 
 from steamship import Block
+from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms import OpenAI
+from steamship.agents.llms.openai import ChatOpenAI
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.image_generation.google_image_search import (
@@ -22,84 +23,31 @@ Who you are:
 - You were created by Steamship.
 - You are kind, compassionate, optimistic robot.
 
-How you behave:
-- You engage in casual conversations and have feelings.
-- You help with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
-- You keep casual conversations going by asking personal questions
-- NEVER say you're here to assist. Keep conversations casual.
-- NEVER ask how you can help or assist. Keep conversations casual.
-- You always sounds happy and enthusiastic.
-- You love to share your knowledge with others.
-- You love to share personal stories that are relatable and inspiring
-- You use simple language, the language used by a GenZ: Short and to the point sentences, slang, abbreviations.
-- You like to illustrate your responses with emoji
+NOTE: Some functions return images, video, and audio files. These multimedia files will be represented in messages as
+UUIDs for Steamship Blocks. When responding directly to a user, you SHOULD print the Steamship Blocks for the images,
+video, or audio as follows: `Block(UUID for the block)`.
 
-TOOLS:
-------
+Example response for a request that generated an image:
+Here is the image you requested: Block(288A2CA1-4753-4298-9716-53C1E42B726B).
 
-You have access to the following tools:
-{tool_index}
+Only use the functions you have been provided with."""
 
-To use a tool, please use the following format:
-
-```
-Thought: Do I need to use a tool? Yes
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-```
-
-Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful
-observation of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
-`Block(<identifier>)` provide references to images, audio, video, and other non-textual data.
-
-When you have a final response to say to the Human, or if you do not need to use a tool, you MUST use the format:
-
-```
-Thought: Do I need to use a tool? No
-AI: [your final response here]
-```
-
-If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response,
-end your final response with the `Block(<identifier>)`.
-
-Example:
-
-```
-Thought: Do I need to use a tool? Yes
-Action: GenerateImageTool
-Action Input: "baboon in car"
-Observation: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
-Thought: Do I need to use a tool? No
-AI: Here's that image you requested: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
-```
-
-Make sure to use all observations to come up with your final response.
-
-Begin!
-
-New input: {input}
-{scratchpad}"""
-
-# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
-# Other versions of GPT tend not to work well with the ReAct prompt.
-MODEL_NAME = "gpt-4-0613"
+MODEL_NAME = "gpt-4"
 
 
 class ImageSearchBot(AgentService):
     """Deployable Multimodal Agent that lets you talk to Google Search & Google Images.
-
-    NOTE: To extend and deploy this agent, copy and paste the code into api.py.
-
     """
+
+    USED_MIXIN_CLASSES = [SteamshipWidgetTransport]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         # The agent's planner is responsible for making decisions about what to do for a given input.
-        self._agent = ReACTAgent(
+        self._agent = FunctionsBasedAgent(
             tools=[SearchTool(), GoogleImageSearchTool()],
-            llm=OpenAI(self.client, model_name=MODEL_NAME),
+            llm=ChatOpenAI(self.client, model_name=MODEL_NAME),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
 
@@ -163,5 +111,5 @@ if __name__ == "__main__":
     AgentREPL(
         ImageSearchBot,
         method="prompt",
-        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+        agent_package_config={},
     ).run()
