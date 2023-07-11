@@ -35,6 +35,8 @@ You can:
 - Add tools, allowing your agent's reasoning process to do new things (see tool list below)
 - Add mixins, allowing your agent to connect to different channels (see mixin list below)
 
+Other examples are found in the `example_agents` folder. Copy/paste one of these into `api.py` to use it.
+
 ## Deploying your agent
 
 [A full guide to deploying is here](https://steamship.com/learn/agent-guidebook/deploying/deploy-your-agent).
