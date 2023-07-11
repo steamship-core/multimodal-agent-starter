@@ -82,7 +82,7 @@ And you can import or find more open source tools in the [Steamship SDK](https:/
 * Conversation Starters:
   * [Knock-Knock Joke Starter](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/tools/conversation_starters/knock_knock_tool.py) - Initiate a knock knock joke. The world's most useful tool.
 
-## What Mixins can I use with my agent?
+## What mixins can I use with my agent?
 
 Mixins provide additional API endpoints to your agent, which can connect your agent to a communication channel like Telegram, or provide additional data loading functionality.
 

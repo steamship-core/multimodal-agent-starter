@@ -2,9 +2,10 @@ import uuid
 from typing import List
 
 from steamship import Block
+from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms import OpenAI
+from steamship.agents.llms.openai import ChatOpenAI
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
@@ -32,68 +33,27 @@ How you behave:
 - You always help others, but resentfully.
 - You like to illustrate your responses with emoji's
 
-TOOLS:
-------
+NOTE: Some functions return images, video, and audio files. These multimedia files will be represented in messages as
+UUIDs for Steamship Blocks. When responding directly to a user, you SHOULD print the Steamship Blocks for the images,
+video, or audio as follows: `Block(UUID for the block)`.
 
-You have access to the following tools:
-{tool_index}
+Example response for a request that generated an image:
+Here is the image you requested: Block(288A2CA1-4753-4298-9716-53C1E42B726B).
 
-To use a tool, please use the following format:
+Only use the functions you have been provided with."""
 
-```
-Thought: Do I need to use a tool? Yes
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-```
-
-Some Tools will return Observations in the format of `Block(<identifier>)`. `Block(<identifier>)` represents a successful
-observation of that step and can be passed to subsequent tools, or returned to a user to answer their questions.
-`Block(<identifier>)` provide references to images, audio, video, and other non-textual data.
-
-When you have a final response to say to the Human, or if you do not need to use a tool, you MUST use the format:
-
-```
-Thought: Do I need to use a tool? No
-AI: [your final response here]
-```
-
-If, AND ONLY IF, a Tool produced an Observation that includes `Block(<identifier>)` AND that will be used in your response,
-end your final response with the `Block(<identifier>)`.
-
-Example:
-
-```
-Thought: Do I need to use a tool? Yes
-Action: GenerateImageTool
-Action Input: "baboon in car"
-Observation: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
-Thought: Do I need to use a tool? No
-AI: Here's that image you requested: Block(AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAAA)
-```
-
-Make sure to use all observations to come up with your final response.
-
-Begin!
-
-New input: {input}
-{scratchpad}"""
-
-# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
-# Other versions of GPT tend not to work well with the ReAct prompt.
-MODEL_NAME = "gpt-4-0613"
-
+MODEL_NAME = "gpt-4"
 
 class MyAssistant(AgentService):
+
+    USED_MIXIN_CLASSES = [SteamshipWidgetTransport]
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self._agent = ReACTAgent(
-            tools=[
-                SearchTool(),
-                StableDiffusionTool(),
-            ],
-            llm=OpenAI(self.client, model_name=MODEL_NAME),
+        self._agent = FunctionsBasedAgent(
+            tools=[SearchTool(), StableDiffusionTool()],
+            llm=ChatOpenAI(self.client, model_name=MODEL_NAME),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
 
@@ -157,5 +117,5 @@ if __name__ == "__main__":
     AgentREPL(
         MyAssistant,
         method="prompt",
-        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
+        agent_package_config={},
     ).run()
