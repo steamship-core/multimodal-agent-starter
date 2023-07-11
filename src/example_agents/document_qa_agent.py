@@ -1,54 +1,31 @@
 import uuid
-from typing import List, Optional
+from typing import List
 
-from steamship import Block, Task
-from steamship.agents.llms.openai import OpenAI
-from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.react import ReACTAgent
-from steamship.agents.schema import Action, AgentContext, FinishAction
+from steamship import Block
+from steamship.agents.functional import FunctionsBasedAgent
+from steamship.agents.llms.openai import ChatOpenAI
+from steamship.agents.schema import AgentContext
 from steamship.agents.schema.context import Metadata
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.utils import with_llm
+from steamship.agents.tools.question_answering import VectorSearchQATool
 from steamship.invocable import post
+from steamship.invocable.mixins.blockifier_mixin import BlockifierMixin
+from steamship.invocable.mixins.file_importer_mixin import FileImporterMixin
+from steamship.invocable.mixins.indexer_mixin import IndexerMixin
 from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMixin
 from steamship.utils.repl import AgentREPL
 
-from example_tools.vector_search_qa_tool import VectorSearchQATool
-
-# Use either "gpt-3.5-turbo-0613" or "gpt-4-0613" here.
-# Other versions of GPT tend not to work well with the ReAct prompt.
-MODEL_NAME = "gpt-4-0613"
-
-
-class ReACTAgentThatAlwaysUsesToolOutput(ReACTAgent):
-    def next_action(self, context: AgentContext) -> Action:
-        """Small wrapper around ReACTAgent that ALWAYS uses the output of a tool if available.
-
-        This tends to defer the response to the tool (in this case, VectorSearchQATool) which dramatically
-        reduces the LLM answering with hallucinations from its own background knowledge.
-        """
-        if context.completed_steps and len(context.completed_steps):
-            last_step = context.completed_steps[-1]
-            return FinishAction(output=last_step.output, context=context)
-        return super().next_action(context)
-
 
 class ExampleDocumentQAService(AgentService):
-    """ExampleDocumentQAService is an example bot you can deploy for PDF and Video Q&A.  # noqa: RST201
+    """DocumentQAService is an example AgentService that exposes:  # noqa: RST201
 
-    To use this example:
+    - A few authenticated endpoints for learning PDF and YouTube documents:
 
-        - Copy this file into api.py in your multimodal-agent-starter project.
-        - Run `ship deploy` from the command line to deploy a new version to the cloud
-        - View and interact with your agent using its web interface.
+         /index_url
+        { url }
 
-    API ACCESS:
-
-    Your agent also exposes an API. It is documented from the web interface, but a quick pointer into what is
-    available is:
-
-        /learn_url  - Learn a PDF or YouTube link
-        /learn_text - Learn a fragment of text
+        /index_text
+        { text }
 
     - An unauthenticated endpoint for answering questions about what it has learned
 
@@ -56,7 +33,7 @@ class ExampleDocumentQAService(AgentService):
     you provide.
     """
 
-    indexer_mixin: IndexerPipelineMixin
+    USED_MIXIN_CLASSES = [IndexerPipelineMixin, FileImporterMixin, BlockifierMixin, IndexerMixin]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -69,47 +46,11 @@ class ExampleDocumentQAService(AgentService):
         #    3) Store the text in a vector index
         #
         # That vector index is then available to the question answering tool, below.
-        self.indexer_mixin = IndexerPipelineMixin(self.client, self)
-        self.add_mixin(self.indexer_mixin, permit_overwrite_of_existing_methods=True)
+        self.add_mixin(IndexerPipelineMixin(self.client, self))
 
-        # A ReACTAgent is an agent that is able to:
-        #    1) Converse with you, casually... but also
-        #    2) Use tools that have been provided to it, such as QA tools or Image Generation tools
-        #
-        # This particular ReACTAgent has been provided with a single tool which will be used whenever
-        # the user answers a question. But you can extend this with more tools if you wish. For example,
-        # you could add tools to generate images, or search Google, or register an account.
-        self._agent = ReACTAgentThatAlwaysUsesToolOutput(
-            tools=[
-                VectorSearchQATool(
-                    agent_description=(
-                        "Used to answer questions. "
-                        "Whenever the input is a question, ALWAYS use this tool. "
-                        "The input is the question. "
-                        "The output is the answer. "
-                    )
-                )
-            ],
-            llm=OpenAI(self.client, model_name=MODEL_NAME),
-        )
-
-        # This Mixin provides HTTP endpoints that connects this agent to a web client
-        self.add_mixin(
-            SteamshipWidgetTransport(
-                client=self.client, agent_service=self, agent=self._agent
-            )
-        )
-
-    @post("/index_url")
-    def index_url(
-        self,
-        url: Optional[str] = None,
-        metadata: Optional[dict] = None,
-        index_handle: Optional[str] = None,
-        mime_type: Optional[str] = None,
-    ) -> Task:
-        return self.indexer_mixin.index_url(
-            url=url, metadata=metadata, index_handle=index_handle, mime_type=mime_type
+        self._agent = FunctionsBasedAgent(
+            tools=[VectorSearchQATool()],
+            llm=ChatOpenAI(self.client),
         )
 
     @post("prompt")
@@ -123,10 +64,6 @@ class ExampleDocumentQAService(AgentService):
         context_id = uuid.uuid4()
         context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
         context.chat_history.append_user_message(prompt)
-        # Add the LLM
-        context = with_llm(
-            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
-        )
 
         # AgentServices provide an emit function hook to access the output of running
         # agents and tools. The emit functions fire at after the supplied agent emits
@@ -139,21 +76,9 @@ class ExampleDocumentQAService(AgentService):
 
         def sync_emit(blocks: List[Block], meta: Metadata):
             nonlocal output
-
-            def block_text(block: Block) -> str:
-                if isinstance(block, dict):
-                    return f"{block}"
-                if block.is_text():
-                    return block.text
-                elif block.url:
-                    return block.url
-                elif block.content_url:
-                    return block.content_url
-                else:
-                    block.set_public_data(True)
-                    return block.raw_data_url
-
-            block_text = "\n".join([block_text(b) for b in blocks])
+            block_text = "\n".join(
+                [b.text if b.is_text() else f"({b.mime_type}: {b.id})" for b in blocks]
+            )
             output += block_text
 
         context.emit_funcs.append(sync_emit)
