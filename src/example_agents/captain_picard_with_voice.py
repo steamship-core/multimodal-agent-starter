@@ -6,7 +6,6 @@ from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms import OpenAI
 from steamship.agents.llms.openai import ChatOpenAI
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import Agent, AgentContext, EmitFunc, Metadata
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
