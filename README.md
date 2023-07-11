@@ -1,7 +1,5 @@
 # Multi-modal Agent Starter
 
-[![Open in a VS Code Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/steamship-core/multimodal-agent-starter)
-
 Create a cloud-hosted LLM Agent with custom personality, multi-modal tools, and memory.
 
 This repository is designed to pair with [this Agent Building Guidebook](https://steamship.com/learn/agent-guidebook)
@@ -10,8 +8,6 @@ This repository is designed to pair with [this Agent Building Guidebook](https:/
 
 You can be up and running in under a minute. [A full setup walk-through is here](https://steamship.com/learn/agent-guidebook/project-setup).
 
-**For localhost development with your own IDE**
-
 Clone this repository, then set up a Python virtual environment with:
 
 ```bash
@@ -19,14 +15,6 @@ python3.8 -m venv .venv
 source .venv/bin/activate
 python3.8 -m pip install -r requirements.txt
 ```
-
-**To use a GitHub Dev Container in your browser:**
-
-Visit [https://github.dev/steamship-core/multimodal-agent-starter](https://github.dev/steamship-core/multimodal-agent-starter), then click on the "Cloud Container" icon at lower-left and re-open in a new Docker container.
-
-**To use a GitHub Dev Container on localhost, with Docker:**
-
-Just click here: [![Open in a VS Code Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/steamship-core/multimodal-agent-starter)
 
 ## Running your agent
 
