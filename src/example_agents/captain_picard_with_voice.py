@@ -93,58 +93,10 @@ class StarTrekCaptainWithVoice(AgentService):
         context.emit_funcs = [wrap_emit(emit_func) for emit_func in context.emit_funcs]
         super().run_agent(agent, context)
 
-    @post("prompt")
-    def prompt(self, prompt: str) -> str:
-        """Run an agent with the provided text as the input."""
-
-        # AgentContexts serve to allow the AgentService to run agents
-        # with appropriate information about the desired tasking.
-        # Here, we create a new context on each prompt, and append the
-        # prompt to the message history stored in the context.
-        context_id = uuid.uuid4()
-        context = AgentContext.get_or_create(self.client, {"id": f"{context_id}"})
-        context.chat_history.append_user_message(prompt)
-        # Add the LLM
-        context = with_llm(
-            context=context, llm=OpenAI(client=self.client, model_name=MODEL_NAME)
-        )
-
-        # AgentServices provide an emit function hook to access the output of running
-        # agents and tools. The emit functions fire at after the supplied agent emits
-        # a "FinishAction".
-        #
-        # Here, we show one way of accessing the output in a synchronous fashion. An
-        # alternative way would be to access the final Action in the `context.completed_steps`
-        # after the call to `run_agent()`.
-        output = ""
-
-        def sync_emit(blocks: List[Block], meta: Metadata):
-            nonlocal output
-
-            def block_text(block: Block) -> str:
-                if isinstance(block, dict):
-                    return f"{block}"
-                if block.is_text():
-                    return block.text
-                elif block.url:
-                    return block.url
-                elif block.content_url:
-                    return block.content_url
-                else:
-                    block.set_public_data(True)
-                    return block.raw_data_url
-
-            block_text = "\n".join([block_text(b) for b in blocks])
-            output += block_text
-
-        context.emit_funcs.append(sync_emit)
-        self.run_agent(self._agent, context)
-        return output
 
 
 if __name__ == "__main__":
     AgentREPL(
         StarTrekCaptainWithVoice,
-        method="prompt",
         agent_package_config={},
     ).run()
