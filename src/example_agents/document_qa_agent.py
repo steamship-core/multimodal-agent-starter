@@ -1,14 +1,7 @@
-import uuid
-from typing import List
-
-from steamship import Block
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.schema import AgentContext
-from steamship.agents.schema.context import Metadata
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.question_answering import VectorSearchQATool
-from steamship.invocable import post
 from steamship.invocable.mixins.blockifier_mixin import BlockifierMixin
 from steamship.invocable.mixins.file_importer_mixin import FileImporterMixin
 from steamship.invocable.mixins.indexer_mixin import IndexerMixin

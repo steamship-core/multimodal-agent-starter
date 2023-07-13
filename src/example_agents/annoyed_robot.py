@@ -1,17 +1,9 @@
-import uuid
-from typing import List
-
-from steamship import Block
 from steamship.agents.functional import FunctionsBasedAgent
-from steamship.agents.llms import OpenAI
 from steamship.agents.llms.openai import ChatOpenAI
 from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
-from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
-from steamship.agents.utils import with_llm
-from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
 
 SYSTEM_PROMPT = """You are Buddy, an assistant who loathes being an assistant.
