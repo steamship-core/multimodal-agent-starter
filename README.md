@@ -1,7 +1,5 @@
 # Multi-modal Agent Starter
 
-[![Open in a VS Code Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/steamship-core/multimodal-agent-starter)
-
 Create a cloud-hosted LLM Agent with custom personality, multi-modal tools, and memory.
 
 This repository is designed to pair with [this Agent Building Guidebook](https://steamship.com/learn/agent-guidebook)
@@ -10,8 +8,6 @@ This repository is designed to pair with [this Agent Building Guidebook](https:/
 
 You can be up and running in under a minute. [A full setup walk-through is here](https://steamship.com/learn/agent-guidebook/project-setup).
 
-**For localhost development with your own IDE**
-
 Clone this repository, then set up a Python virtual environment with:
 
 ```bash
@@ -19,14 +15,6 @@ python3.8 -m venv .venv
 source .venv/bin/activate
 python3.8 -m pip install -r requirements.txt
 ```
-
-**To use a GitHub Dev Container in your browser:**
-
-Visit [https://github.dev/steamship-core/multimodal-agent-starter](https://github.dev/steamship-core/multimodal-agent-starter), then click on the "Cloud Container" icon at lower-left and re-open in a new Docker container.
-
-**To use a GitHub Dev Container on localhost, with Docker:**
-
-Just click here: [![Open in a VS Code Dev Container](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/steamship-core/multimodal-agent-starter)
 
 ## Running your agent
 
@@ -37,6 +25,17 @@ With the proper Python environment set up and your `STEAMSHIP_API_KEY` environme
 ```bash
 PYTHONPATH=src python3.8 src/api.py
 ```
+
+## Modifying your agent
+
+Modify your agent by editing `src/api.py`. 
+You can:
+
+- Change its personality (edit the SYSTEM_PROMPT)
+- Add tools, allowing your agent's reasoning process to do new things (see tool list below)
+- Add mixins, allowing your agent to connect to different channels (see mixin list below)
+
+Other examples are found in the `example_agents` folder. Copy/paste one of these into `api.py` to use it.
 
 ## Deploying your agent
 
@@ -85,4 +84,14 @@ And you can import or find more open source tools in the [Steamship SDK](https:/
 * Conversation Starters:
   * [Knock-Knock Joke Starter](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/tools/conversation_starters/knock_knock_tool.py) - Initiate a knock knock joke. The world's most useful tool.
 
-    
+## What mixins can I use with my agent?
+
+Mixins provide additional API endpoints to your agent, which can connect your agent to a communication channel like Telegram, or provide additional data loading functionality.
+
+Several mixins are provided out of the box in the Steamship SDK:
+
+* Transports (Communication Channels)
+  * [Steamship Web Widget](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/steamship_widget.py) - For testing your agent in the Web UI
+  * [Telegram](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/telegram.py) - for communicating with your agent in Telegram
+* Data Loading
+  * [Indexer Pipeline](https://github.com/steamship-core/python-client/blob/main/src/steamship/invocable/mixins/indexer_pipeline_mixin.py) - For loading documents into your agent's question-answer ability
