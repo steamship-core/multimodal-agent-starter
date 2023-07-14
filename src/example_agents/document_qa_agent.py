@@ -5,7 +5,8 @@ from steamship.agents.tools.question_answering import VectorSearchQATool
 from steamship.invocable.mixins.blockifier_mixin import BlockifierMixin
 from steamship.invocable.mixins.file_importer_mixin import FileImporterMixin
 from steamship.invocable.mixins.indexer_mixin import IndexerMixin
-from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMixin
+from steamship.invocable.mixins.indexer_pipeline_mixin import \
+    IndexerPipelineMixin
 from steamship.utils.repl import AgentREPL
 
 
@@ -26,7 +27,12 @@ class ExampleDocumentQAService(AgentService):
     you provide.
     """
 
-    USED_MIXIN_CLASSES = [IndexerPipelineMixin, FileImporterMixin, BlockifierMixin, IndexerMixin]
+    USED_MIXIN_CLASSES = [
+        IndexerPipelineMixin,
+        FileImporterMixin,
+        BlockifierMixin,
+        IndexerMixin,
+    ]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

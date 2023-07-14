@@ -1,16 +1,16 @@
-from typing import List
+from typing import Type
 
-from steamship import Block
+from pydantic import Field
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.mixins.transports.steamship_widget import \
-    SteamshipWidgetTransport
-from steamship.agents.schema import Agent, AgentContext, EmitFunc, Metadata
+from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
+from steamship.agents.mixins.transports.telegram import (
+    TelegramTransport,
+    TelegramTransportConfig,
+)
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.tools.image_generation.stable_diffusion import \
-    StableDiffusionTool
-from steamship.agents.tools.speech_generation.generate_speech import \
-    GenerateSpeechTool
+from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
+from steamship.invocable import Config
 from steamship.utils.repl import AgentREPL
 
 SYSTEM_PROMPT = """You are Picard, captain of the Starship Enterprise.
@@ -44,15 +44,24 @@ Only use the functions you have been provided with."""
 MODEL_NAME = "gpt-4"
 
 
-class StarTrekCaptainWithVoice(AgentService):
-    """Deployable Multimodal Agent that illustrates a character personality with voice.
+class TelegramBot(AgentService):
+    """Deployable Multimodal Agent that lets you talk to Google Search & Google Images.
 
     NOTE: To extend and deploy this agent, copy and paste the code into api.py.
+
     """
+
+    class TelegramBotConfig(Config):
+        bot_token: str = Field(description="The secret token for your Telegram bot")
+
+    @classmethod
+    def config_cls(cls) -> Type[Config]:
+        return TelegramBot.TelegramBotConfig
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        # The agent's planner is responsible for making decisions about what to do for a given input.
         self._agent = FunctionsBasedAgent(
             tools=[StableDiffusionTool()],
             llm=ChatOpenAI(self.client, model_name=MODEL_NAME),
@@ -65,37 +74,19 @@ class StarTrekCaptainWithVoice(AgentService):
                 client=self.client, agent_service=self, agent=self._agent
             )
         )
-
-    def run_agent(self, agent: Agent, context: AgentContext):
-        """Override run-agent to patch in audio generation as a finishing step for text output."""
-
-        speech = GenerateSpeechTool()
-        speech.generator_plugin_config = {
-            "voice_id": "pNInz6obpgDQGcFmaJgB"  # Adam on ElevenLabs
-        }
-
-        def to_speech_if_text(block: Block):
-            nonlocal speech
-            if not block.is_text():
-                return block
-
-            output_blocks = speech.run([block], context)
-            return output_blocks[0]
-
-        # Note: EmitFunc is Callable[[List[Block], Metadata], None]
-        def wrap_emit(emit_func: EmitFunc):
-            def wrapper(blocks: List[Block], metadata: Metadata):
-                blocks = [to_speech_if_text(block) for block in blocks]
-                return emit_func(blocks, metadata)
-
-            return wrapper
-
-        context.emit_funcs = [wrap_emit(emit_func) for emit_func in context.emit_funcs]
-        super().run_agent(agent, context)
+        # This Mixin provides support for Telegram bots
+        self.add_mixin(
+            TelegramTransport(
+                client=self.client,
+                config=TelegramTransportConfig(bot_token=self.config.bot_token),
+                agent_service=self,
+                agent=self._agent,
+            )
+        )
 
 
 if __name__ == "__main__":
     AgentREPL(
-        StarTrekCaptainWithVoice,
-        agent_package_config={},
+        TelegramBot,
+        agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
     ).run()

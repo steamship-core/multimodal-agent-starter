@@ -1,8 +1,10 @@
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
+from steamship.agents.mixins.transports.steamship_widget import \
+    SteamshipWidgetTransport
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
+from steamship.agents.tools.image_generation.stable_diffusion import \
+    StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.utils.repl import AgentREPL
 
@@ -33,6 +35,7 @@ Only use the functions you have been provided with."""
 
 MODEL_NAME = "gpt-4"
 
+
 class MyAssistant(AgentService):
 
     USED_MIXIN_CLASSES = [SteamshipWidgetTransport]
@@ -52,7 +55,6 @@ class MyAssistant(AgentService):
                 client=self.client, agent_service=self, agent=self._agent
             )
         )
-
 
 
 if __name__ == "__main__":

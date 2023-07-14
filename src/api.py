@@ -1,10 +1,8 @@
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
+from steamship.agents.mixins.transports.steamship_widget import \
+    SteamshipWidgetTransport
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.tools.image_generation.google_image_search import (
-    GoogleImageSearchTool,
-)
 from steamship.agents.tools.search.search import SearchTool
 from steamship.utils.repl import AgentREPL
 
@@ -28,8 +26,7 @@ MODEL_NAME = "gpt-4"
 
 
 class ImageSearchBot(AgentService):
-    """Deployable Multimodal Agent that lets you talk to Google Search & Google Images.
-    """
+    """Deployable Multimodal Agent that lets you talk to Google Search & Google Images."""
 
     USED_MIXIN_CLASSES = [SteamshipWidgetTransport]
 
@@ -49,7 +46,6 @@ class ImageSearchBot(AgentService):
                 client=self.client, agent_service=self, agent=self._agent
             )
         )
-
 
 
 if __name__ == "__main__":
