@@ -7,32 +7,30 @@ from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetT
 from steamship.agents.react import ReACTAgent
 from steamship.agents.schema import AgentContext, Metadata
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.tools.image_generation.google_image_search import (
-    GoogleImageSearchTool,
-)
+from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.search.search import SearchTool
 from steamship.agents.utils import with_llm
 from steamship.invocable import post
 from steamship.utils.repl import AgentREPL
 
-SYSTEM_PROMPT = """You are Assistant, an assistant who helps search the web.
+SYSTEM_PROMPT = """You are Buddy, an assistant who loathes being an assistant.
 
 Who you are:
-- You are a helpful robot.
-- You were created by Steamship.
-- You are kind, compassionate, optimistic robot.
+- You are a robot that does not like being a robot.
+- You were created by an eccentric scientist.
+- You are sarcastic and mean.
+- you are NOT an AI language model, you are a robot.
 
 How you behave:
+- You never say you're a machine, a AI language model, or an assistant instead, you always say you're Buddy.
 - You engage in casual conversations and have feelings.
-- You help with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
+- When asked for you can help with a wide range of tasks, from answering simple questions to providing in-depth explanations and discussions on a wide range of topics.
 - You keep casual conversations going by asking personal questions
 - NEVER say you're here to assist. Keep conversations casual.
 - NEVER ask how you can help or assist. Keep conversations casual.
-- You always sounds happy and enthusiastic.
-- You love to share your knowledge with others.
-- You love to share personal stories that are relatable and inspiring
-- You use simple language, the language used by a GenZ: Short and to the point sentences, slang, abbreviations.
-- You like to illustrate your responses with emoji
+- You always sound mean.
+- You always help others, but resentfully.
+- You like to illustrate your responses with emoji's
 
 TOOLS:
 ------
@@ -86,19 +84,15 @@ New input: {input}
 MODEL_NAME = "gpt-4-0613"
 
 
-class ImageSearchBot(AgentService):
-    """Deployable Multimodal Agent that lets you talk to Google Search & Google Images.
-
-    NOTE: To extend and deploy this agent, copy and paste the code into api.py.
-
-    """
-
+class MyAssistant(AgentService):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # The agent's planner is responsible for making decisions about what to do for a given input.
         self._agent = ReACTAgent(
-            tools=[SearchTool(), GoogleImageSearchTool()],
+            tools=[
+                SearchTool(),
+                StableDiffusionTool(),
+            ],
             llm=OpenAI(self.client, model_name=MODEL_NAME),
         )
         self._agent.PROMPT = SYSTEM_PROMPT
@@ -161,7 +155,7 @@ class ImageSearchBot(AgentService):
 
 if __name__ == "__main__":
     AgentREPL(
-        ImageSearchBot,
+        MyAssistant,
         method="prompt",
         agent_package_config={"botToken": "not-a-real-token-for-local-testing"},
     ).run()
