@@ -5,8 +5,7 @@ This will result in an agent that effectively acts like ChatGPT.
 
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.mixins.transports.steamship_widget import \
-    SteamshipWidgetTransport
+from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
 from steamship.agents.service.agent_service import AgentService
 from steamship.utils.repl import AgentREPL
 

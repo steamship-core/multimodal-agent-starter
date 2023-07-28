@@ -1,14 +1,12 @@
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.mixins.transports.steamship_widget import \
-    SteamshipWidgetTransport
+from steamship.agents.mixins.transports.steamship_widget import SteamshipWidgetTransport
 from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.question_answering import VectorSearchQATool
 from steamship.invocable.mixins.blockifier_mixin import BlockifierMixin
 from steamship.invocable.mixins.file_importer_mixin import FileImporterMixin
 from steamship.invocable.mixins.indexer_mixin import IndexerMixin
-from steamship.invocable.mixins.indexer_pipeline_mixin import \
-    IndexerPipelineMixin
+from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMixin
 from steamship.utils.repl import AgentREPL
 
 
