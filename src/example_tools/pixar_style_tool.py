@@ -8,7 +8,7 @@ from steamship.agents.tools.image_generation.stable_diffusion import StableDiffu
 from steamship.utils.repl import ToolREPL
 
 
-class PixarStyleTool(ImageGeneratorTool):
+class PixarStyleTool(StableDiffusionTool):
     """Tool to generate a Pixar-style image.
 
     This example illustrates wrapping a tool (StableDiffusionTool) with a fixed prompt template that is combined with user input.
