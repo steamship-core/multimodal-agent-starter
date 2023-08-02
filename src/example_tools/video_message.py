@@ -15,9 +15,8 @@ class VideoMessageTool(DIDVideoGeneratorTool):
     human_description: str = "Generate a video message of yourself saying a message. Provide a text prompt that sends your message"
     agent_description: str = None
 
-    def __init__(self, client: Steamship):
+    def __init__(self):
         super().__init__(
-            client=client,
             source_url="https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/617d79ac-2201-4f06-b43e-195f78a5fbfb/width=1472/3.1-066.jpeg",
             stitch=True,
             voice_provider="microsoft",
@@ -52,4 +51,4 @@ class VideoMessageTool(DIDVideoGeneratorTool):
 if __name__ == "__main__":
     print("Try running with an input like 'penguin'")
     with Steamship.temporary_workspace() as client:
-        ToolREPL(VideoMessageTool(client=client)).run()
+        ToolREPL(VideoMessageTool()).run()
