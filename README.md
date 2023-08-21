@@ -17,9 +17,9 @@ python3.8 -m pip install -r requirements.txt
 python3.8 -m pip install -r requirements.dev.txt
 ```
 
-[!NOTE]
-Requirements you put in `requirements.txt` are what will be run along with the agent when you deploy. The dependencies
-in `requirements.dev.txt` have been prepopulated with packages you may need while developing on your machine.
+> [!NOTE]
+> Requirements you put in `requirements.txt` are what will be run along with the agent when you deploy. The dependencies
+> in `requirements.dev.txt` have been prepopulated with packages you may need while developing on your machine.
 
 ## Running your agent
 
