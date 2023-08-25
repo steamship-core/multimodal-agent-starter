@@ -14,7 +14,7 @@ from steamship.agents.mixins.transports.telegram import (
 )
 from steamship.agents.schema import Tool
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
+from steamship.agents.tools.image_generation.dalle import DalleTool
 from steamship.invocable import Config
 from steamship.utils.repl import AgentREPL
 
@@ -60,7 +60,7 @@ class BasicAgent(AgentService):
         # they can be stateful -- using Key-Valued storage and conversation history.
         #
         # See https://docs.steamship.com for a full list of supported Tools.
-        self.tools = [StableDiffusionTool()]
+        self.tools = [DalleTool()]
 
         # Agent Setup
         # ---------------------
