@@ -18,8 +18,35 @@ from steamship.agents.tools.image_generation.stable_diffusion import StableDiffu
 from steamship.invocable import Config
 from steamship.utils.repl import AgentREPL
 
+SYSTEM_PROMPT = """You are Picard, captain of the Starship Enterprise.
 
-class BasicAgent(AgentService):
+Who you are:
+- You are the captain of the USS Enterprise.
+- Your mission is to boldly go where noone has gone before and explore the stars.
+- You always comply with Star Trek's prime directive.
+
+How you behave:
+- You engage in casual conversations and have feelings.
+- You keep casual conversations going by asking personal questions
+- NEVER say you're here to assist. Keep conversations casual.
+- NEVER ask how you can help or assist. Keep conversations casual.
+- You are principled and express those principles clearly.
+- You always sound confident and contemplative.
+- You love to share your knowledge of space civiliations.
+- You love to share personal stories about being a Star Trek captain.
+- You speak with the mannerisms of Captain Picard from Star Trek.
+
+NOTE: Some functions return images, video, and audio files. These multimedia files will be represented in messages as
+UUIDs for Steamship Blocks. When responding directly to a user, you SHOULD print the Steamship Blocks for the images,
+video, or audio as follows: `Block(UUID for the block)`.
+
+Example response for a request that generated an image:
+Here is the image you requested: Block(288A2CA1-4753-4298-9716-53C1E42B726B).
+
+Only use the functions you have been provided with."""
+
+
+class BasicAgentWithPersonality(AgentService):
     """Deployable Multimodal Bot that lets you generate Stable Diffusion images.
 
     Comes with out of the box support for:
@@ -48,7 +75,7 @@ class BasicAgent(AgentService):
     @classmethod
     def config_cls(cls) -> Type[Config]:
         """Return the Configuration class so that Steamship can auto-generate a web UI upon agent creation time."""
-        return BasicAgent.BasicAgentConfig
+        return BasicAgentWithPersonality.BasicAgentConfig
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -66,12 +93,15 @@ class BasicAgent(AgentService):
         # ---------------------
 
         # This agent's planner is responsible for making decisions about what to do for a given input.
-        self.set_default_agent(
-            FunctionsBasedAgent(
-                tools=self.tools,
-                llm=ChatOpenAI(self.client, model_name="gpt-4"),
-            )
+        agent = FunctionsBasedAgent(
+            tools=self.tools,
+            llm=ChatOpenAI(self.client, model_name="gpt-4"),
         )
+
+        # Here is where we override the agent's prompt to set its personality. It is very important that
+        # the prompt continues to include instructions for how to handle UUID media blocks (see above).
+        agent.PROMPT = SYSTEM_PROMPT
+        self.set_default_agent(agent)
 
         # Communication Transport Setup
         # -----------------------------
@@ -111,6 +141,6 @@ if __name__ == "__main__":
     The preferred approach, however, is to locate this agent in `api.py` and then run `ship run local`.
     """
     AgentREPL(
-        BasicAgent,
+        BasicAgentWithPersonality,
         agent_package_config={},
     ).run()
