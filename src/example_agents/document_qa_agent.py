@@ -20,7 +20,6 @@ from steamship.invocable.mixins.blockifier_mixin import BlockifierMixin
 from steamship.invocable.mixins.file_importer_mixin import FileImporterMixin
 from steamship.invocable.mixins.indexer_mixin import IndexerMixin
 from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMixin
-from steamship.utils.repl import AgentREPL
 
 
 class DocumentQAAgentService(AgentService):
@@ -134,11 +133,3 @@ class DocumentQAAgentService(AgentService):
                 agent_service=self,
             )
         )
-
-
-if __name__ == "__main__":
-    """Run a REPL for this agent.
-
-    The preferred approach, however, is to locate this agent in `api.py` and then run `ship run local`.
-    """
-    AgentREPL(DocumentQAAgentService, agent_package_config={}).run()

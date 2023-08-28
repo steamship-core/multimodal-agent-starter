@@ -18,7 +18,6 @@ from steamship.agents.service.agent_service import AgentService
 from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.agents.tools.speech_generation import GenerateSpeechTool
 from steamship.invocable import Config
-from steamship.utils.repl import AgentREPL
 
 SYSTEM_PROMPT = """You are Picard, captain of the Starship Enterprise.
 
@@ -164,14 +163,3 @@ class BasicAgentServiceWithPersonalityAndVoice(AgentService):
 
         context.emit_funcs = [wrap_emit(emit_func) for emit_func in context.emit_funcs]
         super().run_agent(agent, context)
-
-
-if __name__ == "__main__":
-    """Run a REPL for this agent.
-
-    The preferred approach, however, is to locate this agent in `api.py` and then run `ship run local`.
-    """
-    AgentREPL(
-        BasicAgentServiceWithPersonalityAndVoice,
-        agent_package_config={},
-    ).run()
