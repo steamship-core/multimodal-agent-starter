@@ -19,7 +19,7 @@ from steamship.invocable import Config
 from steamship.utils.repl import AgentREPL
 
 
-class BasicAgent(AgentService):
+class BasicAgentService(AgentService):
     """Deployable Multimodal Bot that lets you generate Stable Diffusion images.
 
     Comes with out of the box support for:
@@ -32,14 +32,14 @@ class BasicAgent(AgentService):
     USED_MIXIN_CLASSES = [SteamshipWidgetTransport, TelegramTransport, SlackTransport]
     """USED_MIXIN_CLASSES tells Steamship what additional HTTP endpoints to register on your AgentService."""
 
-    class BasicAgentConfig(Config):
+    class BasicAgentServiceConfig(Config):
         """Pydantic definition of the user-settable Configuration of this Agent."""
 
         telegram_bot_token: str = Field(
             "", description="[Optional] Secret token for connecting to Telegram"
         )
 
-    config: BasicAgentConfig
+    config: BasicAgentServiceConfig
     """The configuration block that users who create an instance of this agent will provide."""
 
     tools: List[Tool]
@@ -48,7 +48,7 @@ class BasicAgent(AgentService):
     @classmethod
     def config_cls(cls) -> Type[Config]:
         """Return the Configuration class so that Steamship can auto-generate a web UI upon agent creation time."""
-        return BasicAgent.BasicAgentConfig
+        return BasicAgentService.BasicAgentServiceConfig
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     The preferred approach, however, is to locate this agent in `api.py` and then run `ship run local`.
     """
     AgentREPL(
-        BasicAgent,
+        BasicAgentService,
         agent_package_config={},
     ).run()

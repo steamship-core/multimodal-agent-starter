@@ -23,7 +23,7 @@ from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMix
 from steamship.utils.repl import AgentREPL
 
 
-class DocumentQAAgent(AgentService):
+class DocumentQAAgentService(AgentService):
     """DocumentQAService is an example AgentService that exposes:  # noqa: RST201
 
     - A few authenticated endpoints for learning PDF and YouTube documents:
@@ -51,14 +51,14 @@ class DocumentQAAgent(AgentService):
     ]
     """USED_MIXIN_CLASSES tells Steamship what additional HTTP endpoints to register on your AgentService."""
 
-    class DocumentQAAgentConfig(Config):
+    class DocumentQAAgentServiceConfig(Config):
         """Pydantic definition of the user-settable Configuration of this Agent."""
 
         telegram_bot_token: str = Field(
             "", description="[Optional] Secret token for connecting to Telegram"
         )
 
-    config: DocumentQAAgentConfig
+    config: DocumentQAAgentServiceConfig
     """The configuration block that users who create an instance of this agent will provide."""
 
     tools: List[Tool]
@@ -67,7 +67,7 @@ class DocumentQAAgent(AgentService):
     @classmethod
     def config_cls(cls) -> Type[Config]:
         """Return the Configuration class so that Steamship can auto-generate a web UI upon agent creation time."""
-        return DocumentQAAgent.DocumentQAAgentConfig
+        return DocumentQAAgentService.DocumentQAAgentServiceConfig
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -141,4 +141,4 @@ if __name__ == "__main__":
 
     The preferred approach, however, is to locate this agent in `api.py` and then run `ship run local`.
     """
-    AgentREPL(DocumentQAAgent, agent_package_config={}).run()
+    AgentREPL(DocumentQAAgentService, agent_package_config={}).run()

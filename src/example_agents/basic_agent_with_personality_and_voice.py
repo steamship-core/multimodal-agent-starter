@@ -48,7 +48,7 @@ Here is the image you requested: Block(288A2CA1-4753-4298-9716-53C1E42B726B).
 Only use the functions you have been provided with."""
 
 
-class BasicAgentWithPersonalityAndVoice(AgentService):
+class BasicAgentServiceWithPersonalityAndVoice(AgentService):
     """Deployable Multimodal Bot that lets you generate Stable Diffusion images.
 
     Comes with out of the box support for:
@@ -61,7 +61,7 @@ class BasicAgentWithPersonalityAndVoice(AgentService):
     USED_MIXIN_CLASSES = [SteamshipWidgetTransport, TelegramTransport, SlackTransport]
     """USED_MIXIN_CLASSES tells Steamship what additional HTTP endpoints to register on your AgentService."""
 
-    class BasicAgentConfig(Config):
+    class BasicAgentServiceConfig(Config):
         """Pydantic definition of the user-settable Configuration of this Agent."""
 
         telegram_bot_token: str = Field(
@@ -72,7 +72,7 @@ class BasicAgentWithPersonalityAndVoice(AgentService):
             description="[Optional] ElevenLabs voice ID (default: Adam)",
         )
 
-    config: BasicAgentConfig
+    config: BasicAgentServiceConfig
     """The configuration block that users who create an instance of this agent will provide."""
 
     tools: List[Tool]
@@ -81,7 +81,7 @@ class BasicAgentWithPersonalityAndVoice(AgentService):
     @classmethod
     def config_cls(cls) -> Type[Config]:
         """Return the Configuration class so that Steamship can auto-generate a web UI upon agent creation time."""
-        return BasicAgentWithPersonalityAndVoice.BasicAgentConfig
+        return BasicAgentServiceWithPersonalityAndVoice.BasicAgentServiceConfig
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -172,6 +172,6 @@ if __name__ == "__main__":
     The preferred approach, however, is to locate this agent in `api.py` and then run `ship run local`.
     """
     AgentREPL(
-        BasicAgentWithPersonalityAndVoice,
+        BasicAgentServiceWithPersonalityAndVoice,
         agent_package_config={},
     ).run()
