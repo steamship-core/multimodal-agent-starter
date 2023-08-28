@@ -14,50 +14,31 @@ from steamship.agents.mixins.transports.telegram import (
 )
 from steamship.agents.schema import Tool
 from steamship.agents.service.agent_service import AgentService
-from steamship.agents.tools.question_answering import VectorSearchQATool
+from steamship.agents.tools.image_generation.stable_diffusion import StableDiffusionTool
 from steamship.invocable import Config
-from steamship.invocable.mixins.blockifier_mixin import BlockifierMixin
-from steamship.invocable.mixins.file_importer_mixin import FileImporterMixin
-from steamship.invocable.mixins.indexer_mixin import IndexerMixin
-from steamship.invocable.mixins.indexer_pipeline_mixin import IndexerPipelineMixin
 
 
-class DocumentQAAgentService(AgentService):
-    """DocumentQAService is an example AgentService that exposes:  # noqa: RST201
+class BasicAgentService(AgentService):
+    """Deployable Multimodal Bot that lets you generate Stable Diffusion images.
 
-    - A few authenticated endpoints for learning PDF and YouTube documents:
+    Comes with out of the box support for:
+    - Telegram
+    - Slack
+    - Web Embeds
 
-         /index_url
-        { url }
-
-        /index_text
-        { text }
-
-    - An unauthenticated endpoint for answering questions about what it has learned
-
-    This agent provides a starter project for special purpose QA agents that can answer questions about documents
-    you provide.
     """
 
-    USED_MIXIN_CLASSES = [
-        IndexerPipelineMixin,
-        FileImporterMixin,
-        BlockifierMixin,
-        IndexerMixin,
-        SteamshipWidgetTransport,
-        TelegramTransport,
-        SlackTransport,
-    ]
+    USED_MIXIN_CLASSES = [SteamshipWidgetTransport, TelegramTransport, SlackTransport]
     """USED_MIXIN_CLASSES tells Steamship what additional HTTP endpoints to register on your AgentService."""
 
-    class DocumentQAAgentServiceConfig(Config):
+    class BasicAgentServiceConfig(Config):
         """Pydantic definition of the user-settable Configuration of this Agent."""
 
         telegram_bot_token: str = Field(
             "", description="[Optional] Secret token for connecting to Telegram"
         )
 
-    config: DocumentQAAgentServiceConfig
+    config: BasicAgentServiceConfig
     """The configuration block that users who create an instance of this agent will provide."""
 
     tools: List[Tool]
@@ -66,7 +47,7 @@ class DocumentQAAgentService(AgentService):
     @classmethod
     def config_cls(cls) -> Type[Config]:
         """Return the Configuration class so that Steamship can auto-generate a web UI upon agent creation time."""
-        return DocumentQAAgentService.DocumentQAAgentServiceConfig
+        return BasicAgentService.BasicAgentServiceConfig
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -78,30 +59,18 @@ class DocumentQAAgentService(AgentService):
         # they can be stateful -- using Key-Valued storage and conversation history.
         #
         # See https://docs.steamship.com for a full list of supported Tools.
-        self.tools = [VectorSearchQATool()]
+        self.tools = [StableDiffusionTool()]
 
         # Agent Setup
         # ---------------------
 
+        # This agent's planner is responsible for making decisions about what to do for a given input.
         self.set_default_agent(
             FunctionsBasedAgent(
                 tools=self.tools,
-                llm=ChatOpenAI(self.client),
+                llm=ChatOpenAI(self.client, model_name="gpt-4"),
             )
         )
-
-        # Document QA Mixin Setup
-        # -----------------------
-
-        # This Mixin provides HTTP endpoints that coordinate the learning of documents.
-        #
-        # It adds the `/learn_url` endpoint which will:
-        #    1) Download the provided URL (PDF, YouTube URL, etc)
-        #    2) Convert that URL into text
-        #    3) Store the text in a vector index
-        #
-        # That vector index is then available to the question answering tool, below.
-        self.add_mixin(IndexerPipelineMixin(self.client, self))
 
         # Communication Transport Setup
         # -----------------------------

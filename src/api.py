@@ -1,14 +1,10 @@
-"""Minimum viable AgentService implementation.
-
-This will result in an agent that effectively acts like ChatGPT.
-"""
-
-from steamship.agents.functional import FunctionsBasedAgent
-from steamship.agents.llms.openai import ChatOpenAI
-from steamship.agents.service.agent_service import AgentService
+# The Steamship runtime will pick up the AgentService that you have defined in api.py
+#
+# Here, we're importing a basic example and re-exporting it so that the Steamship Runtime will pick it up.
+#
+# To build your own, copy-paste one of the examples form src/example_agents into this file and edit.
+from example_agents.basic_agent import BasicAgentService
 
 
-class MyAssistant(AgentService):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._agent = FunctionsBasedAgent(llm=ChatOpenAI(self.client), tools=[])
+class MyAgentService(BasicAgentService):
+    pass
