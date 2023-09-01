@@ -18,6 +18,11 @@
 			"type": "string",
 			"description": "[Optional] Secret token for connecting to Telegram",
 			"default": ""
+		},
+		"eleven_labs_voice_id": {
+			"type": "string",
+			"description": "[Optional] ElevenLabs voice ID (default: Adam)",
+			"default": "pNInz6obpgDQGcFmaJgB"
 		}
 	},
 	"steamshipRegistry": {
