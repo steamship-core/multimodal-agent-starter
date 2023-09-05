@@ -1,8 +1,8 @@
 {
 	"type": "package",
-	"handle": "foo-bar-baz",
-	"version": "",
-	"description": "",
+	"handle": "question-answering-bot",
+	"version": "1.0.0",
+	"description": "Learns from PDFs, YouTube videos, and text. Then answers questions about them in natural language.",
 	"author": "",
 	"entrypoint": "Unused",
 	"public": true,

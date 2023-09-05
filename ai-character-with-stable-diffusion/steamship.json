@@ -1,9 +1,9 @@
 {
 	"type": "package",
-	"handle": "ai-character-with-voice",
-	"version": "",
-	"description": "An AI Character whose personality you can set.",
-	"author": "",
+	"handle": "ai-character-with-stable-diffusion",
+	"version": "1.0.0",
+	"description": "A character whose personality you can customize. Can generate Stable Diffusion images and send them back to the user.",
+	"author": "Steamship",
 	"entrypoint": "Unused",
 	"public": true,
 	"plugin": null,
