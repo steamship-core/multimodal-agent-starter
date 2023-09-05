@@ -1,7 +1,7 @@
 {
 	"type": "package",
 	"handle": "ai-character-with-voice",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "A character whose personality you can customize. Responds with voice and can generate Stable Diffusion images.",
 	"author": "",
 	"entrypoint": "Unused",
