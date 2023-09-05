@@ -1,8 +1,8 @@
 {
 	"type": "package",
-	"handle": "foo-bar-baz",
-	"version": "",
-	"description": "",
+	"handle": "ai-character-with-voice",
+	"version": "1.0.0",
+	"description": "A character whose personality you can customize. Responds with voice and can generate Stable Diffusion images.",
 	"author": "",
 	"entrypoint": "Unused",
 	"public": true,
