@@ -1,0 +1,41 @@
+{
+	"type": "package",
+	"handle": "ai-character-with-dynamic-prompt",
+	"version": "1.0.1",
+	"description": "A character whose personality you can customize dynamically.",
+	"author": "Steamship",
+	"entrypoint": "Unused",
+	"public": true,
+	"plugin": null,
+	"build_config": {
+		"ignore": [
+			"tests",
+			"examples"
+		]
+	},
+	"configTemplate": {
+		"telegram_bot_token": {
+			"type": "string",
+			"description": "[Optional] Secret token for connecting to Telegram",
+			"default": ""
+		}
+	},
+	"steamshipRegistry": {
+		"tagline": "",
+		"tagline2": null,
+		"usefulFor": null,
+		"videoUrl": null,
+		"githubUrl": null,
+		"demoUrl": null,
+		"blogUrl": null,
+		"jupyterUrl": null,
+		"authorGithub": "",
+		"authorName": "",
+		"authorEmail": null,
+		"authorTwitter": null,
+		"authorUrl": null,
+		"tags": [
+			"MultiModalAgentStarter"
+		]
+	}
+}
