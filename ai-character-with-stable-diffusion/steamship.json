@@ -1,6 +1,6 @@
 {
 	"type": "package",
-	"handle": "ted-example-thing",
+	"handle": "ai-character-with-stable-diffusion",
 	"version": "1.0.0",
 	"description": "A character whose personality you can customize. Can generate Stable Diffusion images and send them back to the user.",
 	"author": "Steamship",
