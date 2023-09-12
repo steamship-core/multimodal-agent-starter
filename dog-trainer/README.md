@@ -1,8 +1,17 @@
-# AI Character with Stable Diffusion
+# AI Dog Trainer
 
-Create a cloud-hosted LLM Agent with custom personality and Stable Diffusion image generation ability.
+This Agent is intended to be used in conjunction with the companion [Vercel Example here](https://github.com/steamship-core/steamship-frontend/tree/main/examples/with-nextjs-auth-and-database).
 
-This repository is designed to pair with [this Agent Building Guidebook](https://docs/steamship.com/agent-guidebook)
+It implements a very basic exploration of the following ideas:
+
+* Offering an API Method (`/set_prompt_arguments`) that lets a web app set a list of **DOGS** that are being cared for, as well as their breeds.
+* Engages in conversations about dog care in general
+* Permits the user to discuss their dogs (set via `set_prompt_arguments`) by name, specifically:
+  * Asking questions ("How much should Barky eat?".. "What about Fido?")
+  * Generating simulated images ("Show me a picture of Rocky swimming in the river")
+
+In the case of specific questions about the dog, the agent will use a series of prompt rewriting tricks to de-reference the dog name or pronoun into
+a prompt that is specific to the particular breed and description of dog that the agent has learned.
 
 ## Getting Started
 
@@ -31,6 +40,8 @@ With the proper Python environment set up and your `STEAMSHIP_API_KEY` environme
 ship run local
 ```
 
+Note that this Agent will actively refuse to respond until you have invoked the `/set_prompt_arguments` to tell it about some Dogs 🐕.
+
 ## Modifying your agent
 
 Modify your agent by editing `api.py`. 
@@ -55,13 +66,18 @@ ship deploy
 
 and follow the prompts.
 
-## What tools can I use with my agent?
+## Connecting your agent to the web
+
+This Agent is intended to be used in conjunction with the companion [Vercel Example here](https://github.com/steamship-core/steamship-frontend/tree/main/examples/with-nextjs-auth-and-database).
+Just follow the directions on that README and then set the `STEAMSHIP_PACKAGE_HANDLE` environment variable to the value of your version of this agent rather than the `ai-dog-trainer` value provided in that example.
+
+## What other tools can I use with my agent?
 
 Tools help your agent perform actions or fetch information from the outside world. 
 The Steamship SDK includes [a large set of multi-modal & memory-aware tools you can use right away](https://docs.steamship.com/agent-guidebook/core-concepts/tools).
 And you can import or find more open source tools in the [Steamship SDK](https://github.com/steamship-core/python-client):
 
-## What mixins can I use with my agent?
+## What other mixins can I use with my agent?
 
 Mixins provide additional API endpoints to your agent, which can connect your agent to a communication channel like Telegram, or provide additional data loading functionality.
 
