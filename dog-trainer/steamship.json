@@ -1,7 +1,7 @@
 {
 	"type": "package",
 	"handle": "ai-dog-trainer",
-	"version": "1.0.2-rc.5",
+	"version": "1.0.2-rc.6",
 	"description": "A dog trainer who knows about your dogs and provides advice.",
 	"author": "Steamship",
 	"entrypoint": "Unused",
