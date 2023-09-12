@@ -1,2 +1,2 @@
-ngrok~=0.9.1
+ngrok~=0.9.0
 pyngrok~=6.0.0
