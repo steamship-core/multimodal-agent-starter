@@ -67,9 +67,9 @@ Mixins provide additional API endpoints to your agent, which can connect your ag
 
 Several mixins are provided out of the box in the Steamship SDK:
 
-* Transports (Communication Channels)
-  * [Steamship Web Widget](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/steamship_widget.py) - For testing your agent in the Web UI
-  * [Telegram](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/telegram.py) - for communicating with your agent in Telegram
-  * [Slack](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/slack.py) - for communicating with your agent in Slack
-* Data Loading
-  * [Indexer Pipeline](https://github.com/steamship-core/python-client/blob/main/src/steamship/invocable/mixins/indexer_pipeline_mixin.py) - For loading documents into your agent's question-answer ability
+- Transports (Communication Channels)
+  - [Steamship Web Widget](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/steamship_widget.py) - For testing your agent in the Web UI
+  - [Telegram](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/telegram.py) - for communicating with your agent in Telegram
+  - [Slack](https://github.com/steamship-core/python-client/blob/main/src/steamship/agents/mixins/transports/slack.py) - for communicating with your agent in Slack
+- Data Loading
+  - [Indexer Pipeline](https://github.com/steamship-core/python-client/blob/main/src/steamship/invocable/mixins/indexer_pipeline_mixin.py) - For loading documents into your agent's question-answer ability

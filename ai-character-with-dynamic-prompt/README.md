@@ -13,7 +13,7 @@ View the `api.py` file for full documentation on how the personality is defined,
 * The `__init__` method, in which the saved personality is loaded and sets the Agent's system prompt
 * The `set_prompt_arguments` method, which allows one to set new values for `DynamicPromptArguments`
 
-The best way to try this agent out is to deploy it and then create a new instance on the web. Then, visit the 
+The best way to try this agent out is to deploy it and then create a new instance on the web. Then, visit the
 **API Tab** of your agent instance's management console and run the `set_prompt_arguments` method to set a new
 personality. Finally, visit the **Chat** tab to chat with this new personality.
 
@@ -46,13 +46,13 @@ python3.8 api.py
 
 ## Modifying your agent
 
-Modify your agent by editing `api.py`. 
+Modify your agent by editing `api.py`.
 
 You can:
 
-- Change its personality (edit the SYSTEM_PROMPT)
-- Add tools, allowing your agent's reasoning process to do new things (see tool list below)
-- Add mixins, allowing your agent to connect to different channels (see mixin list below)
+* Change its personality (edit the SYSTEM_PROMPT)
+* Add tools, allowing your agent's reasoning process to do new things (see tool list below)
+* Add mixins, allowing your agent to connect to different channels (see mixin list below)
 
 Other examples are found in the `example_agents` folder. Copy/paste one of these into `api.py` to use it.
 
@@ -70,7 +70,7 @@ and follow the prompts.
 
 ## What tools can I use with my agent?
 
-Tools help your agent perform actions or fetch information from the outside world. 
+Tools help your agent perform actions or fetch information from the outside world.
 The Steamship SDK includes [a large set of multi-modal & memory-aware tools you can use right away](https://docs.steamship.com/agent-guidebook/core-concepts/tools).
 And you can import or find more open source tools in the [Steamship SDK](https://github.com/steamship-core/python-client):
 
