@@ -23,7 +23,7 @@ The best places to learn about adapting these starter projects are:
 
 ## Contributing
 
-We welcome your own agent starter projects! 
+We welcome your own agent starter projects!
 
 To contribute one:
 
