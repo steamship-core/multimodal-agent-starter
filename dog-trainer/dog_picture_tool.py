@@ -82,23 +82,43 @@ class DogPictureTool(Tool):
 
     dogs: List[Dog]
 
+    def dog_list_as_json_bullets(self) -> str:
+        """Return the list of dogs we know about as JSON bullet points.
+
+        LLMs don't care if we speak in English or JSON, so this is a perfectly fine way to enumerate them.
+        """
+        return "\n".join([f"- {json.dumps(dog.dict())}" for dog in self.dogs])
+
+    def rewrite_photo_request_with_better_details(
+        self, request: str, context: AgentContext
+    ) -> str:
+        """Rewrite a photo request with more specific information about the dog specified.
+
+        For example, if the user says: "Give me a picture of Barky swimming"
+        We want the rewrite to be something like: "Picture of a chocolate labrador with shaggy hair swimming"
+        """
+        llm = get_llm(context, default=OpenAI(client=context.client))
+        dogs = self.dog_list_as_json_bullets()
+        photo_request = llm.complete(
+            PHOTO_REQUEST_REWRITE.format(dogs=dogs, request=request)
+        )[0].text.strip()
+        return photo_request
+
     def run(
         self, tool_input: List[Block], context: AgentContext
     ) -> Union[List[Block], Task[Any]]:
+        # Rewrite the photo request with information about the breed and description
+        photo_request = self.rewrite_photo_request_with_better_details(
+            tool_input[0].text, context
+        )
 
+        # Create a stable diffusion prompt for the image
         llm = get_llm(context, default=OpenAI(client=context.client))
-
-        dogs = "\n".join([f"- {json.dumps(dog.dict())}" for dog in self.dogs])
-
-        photo_request = llm.complete(
-            PHOTO_REQUEST_REWRITE.format(dogs=dogs, request=tool_input[0].text)
-        )[0].text.strip()
-
         sd_prompt = llm.complete(PROMPT_TOOL.format(topic=photo_request))[
             0
         ].text.strip()
 
-        # Create the Stable Diffusion tool we want to wrap
+        # Run and return the StableDiffusionTool response
         stable_diffusion_tool = StableDiffusionTool()
 
         # Now return the results of running Stable Diffusion on those modified prompts.
@@ -106,7 +126,7 @@ class DogPictureTool(Tool):
 
 
 if __name__ == "__main__":
-    print("Try running with an input like 'penguin'")
+    print("Try running with an input like 'Fido'")
     ToolREPL(
         DogPictureTool(
             dogs=[

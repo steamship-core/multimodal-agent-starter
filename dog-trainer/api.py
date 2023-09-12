@@ -1,3 +1,17 @@
+"""Dog Trainer Example.
+
+This AgentService provides an example of how a single agent can:
+
+1) Use an API to remember a fixed set of structured data (Dogs, in this case)
+2) Answer questions about that fixed set of structured information.
+
+Its intended behavior is to:
+
+1) Chat with you, in general, about your dogs.
+2) Accept, via API, a list of your dogs in the form: [{name, breed, description}]
+3) Answer questions about particular dog breeds using their name ("How much should Fido eat?")
+4) Generate simulated photos of your dogs using their name ("Show me a picture of Buster swimming in a lake")
+"""
 import json
 import logging
 from typing import List, Optional, Type
@@ -46,9 +60,11 @@ How you behave:
 
 {behavior}
 
-You take care of the following dogs:
+You take care of the following dogs.
 
 {dogs}
+
+While you can talk about dogs and dog breeds in general, you only answer questions about the specific dogs above.
 
 NOTE: Some functions return images, video, and audio files. These multimedia files will be represented in messages as
 UUIDs for Steamship Blocks. When responding directly to a user, you SHOULD print the Steamship Blocks for the images,
@@ -158,13 +174,7 @@ class DogTrainer(AgentService):
         # -----------
         #
         # WOOF! WOOF! Load the list of dogs we know about.
-        self.dogs = [
-            Dog(
-                name="Fido",
-                breed="Chocolate Laborador Retriever",
-                description="Loves to run.",
-            )
-        ]
+        self.dogs = []
 
         try:
             if self.prompt_arguments.dogs:
@@ -262,10 +272,14 @@ class DogTrainer(AgentService):
         # Set prompt_arguments to the new data provided by the API caller.
         self.prompt_arguments = DynamicPromptArguments.parse_obj(
             {
-                "name": name,
-                "byline": byline,
-                "identity": identity,
-                "behavior": behavior,
+                "name": name or self.prompt_arguments.name or DEFAULT_NAME,
+                "byline": byline or self.prompt_arguments.byline or DEFAULT_BYLINE,
+                "identity": identity
+                or self.prompt_arguments.identity
+                or DEFAULT_IDENTITY,
+                "behavior": behavior
+                or self.prompt_arguments.behavior
+                or DEFAULT_BEHAVIOR,
                 "dogs": dogs,
             }
         )

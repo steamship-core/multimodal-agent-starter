@@ -35,28 +35,43 @@ class DogQuestionTool(Tool):
 
     dogs: List[Dog]
 
+    def dog_list_as_json_bullets(self) -> str:
+        """Return the list of dogs we know about as JSON bullet points.
+
+        LLMs don't care if we speak in English or JSON, so this is a perfectly fine way to enumerate them.
+        """
+        return "\n".join([f"- {json.dumps(dog.dict())}" for dog in self.dogs])
+
+    def rewrite_question_with_better_details(
+        self, request: str, context: AgentContext
+    ) -> str:
+        """Rewrite a question with more specific information about the dog specified.
+
+        For example, if the user says: "How much should Barky eat?"
+        We want the rewrite to be something like: "How much should a  chocolate labrador that is 2 years old eat?"
+        """
+        llm = get_llm(context, default=OpenAI(client=context.client))
+        dogs = self.dog_list_as_json_bullets()
+        rewritten_question = llm.complete(
+            QUESTION_REWRITE.format(dogs=dogs, request=request)
+        )[0].text.strip()
+        return rewritten_question
+
     def run(
         self, tool_input: List[Block], context: AgentContext
     ) -> Union[List[Block], Task[Any]]:
-        llm = get_llm(context, default=OpenAI(client=context.client))
+        # Rewrite the question with information about the breed and description
+        rewritten_question = self.rewrite_question_with_better_details(
+            tool_input[0].text, context
+        )
 
-        dogs = "\n".join([f"- {json.dumps(dog.dict())}" for dog in self.dogs])
-
-        rewritten_question = llm.complete(
-            QUESTION_REWRITE.format(dogs=dogs, request=tool_input[0].text)
-        )[0].text.strip()
-
-        print(rewritten_question)
-
-        # Create the Stable Diffusion tool we want to wrap
+        # Now return the results of issuing that question to Google
         search_tool = SearchTool()
-
-        # Now return the results of running Stable Diffusion on those modified prompts.
         return search_tool.run([Block(text=rewritten_question)], context)
 
 
 if __name__ == "__main__":
-    print("Try running with an input like 'penguin'")
+    print("Try running with an input like 'Fido'")
     ToolREPL(
         DogQuestionTool(
             dogs=[

@@ -28,7 +28,7 @@ python3.8 -m pip install -r requirements.dev.txt
 With the proper Python environment set up and your `STEAMSHIP_API_KEY` environment variable set, just run:
 
 ```bash
-python3.8 api.py
+ship run local
 ```
 
 ## Modifying your agent
