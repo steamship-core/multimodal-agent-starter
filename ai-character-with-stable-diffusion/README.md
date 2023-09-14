@@ -2,11 +2,11 @@
 
 Create a cloud-hosted LLM Agent with custom personality and Stable Diffusion image generation ability.
 
-This repository is designed to pair with [this Agent Building Guidebook](https://docs/steamship.com/agent-guidebook)
+This repository is designed to pair with [this Agent Building Guidebook](https://docs.steamship.com/agent-guidebook)
 
 ## Getting Started
 
-You can be up and running in under a minute. [A full setup walk-through is here](https://steamship.com/learn/agent-guidebook/project-setup).
+You can be up and running in under a minute. [A full setup walk-through is here](https://docs.steamship.com/agent-guidebook/core-concepts/project-layout).
 
 Clone this repository, then set up a Python virtual environment with:
 
