@@ -17,9 +17,9 @@ Each sub-folder contains a fully-working example:
 
 The best places to learn about adapting these starter projects are:
 
-* The [Steamship Discord](https://steamship.com/discord)
 * The [Agent Building Guidebook](https://docs.steamship.com/agent-guidebook)
 * Chat with us [on Twitter](https://twitter.com/GetSteamship)
+* Email us!  support [at] steamship [dot] com.
 
 ## Contributing
 
