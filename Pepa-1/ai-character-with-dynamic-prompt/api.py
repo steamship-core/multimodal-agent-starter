@@ -107,7 +107,7 @@ class BasicAgentServiceWithDynamicPrompt(AgentService):
         """Pydantic definition of the user-settable Configuration of this Agent."""
 
         telegram_bot_token: str = Field(
-            "", description="[Optional] Secret token for connecting to Telegram"
+            "", description="6791837133:AAFXeYp76AJafom_i2Fkr4Ejg2m7y_-C_sw"
         )
 
     config: BasicAgentServiceWithDynamicPromptConfig
