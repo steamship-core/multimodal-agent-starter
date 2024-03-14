@@ -1,7 +1,7 @@
 {
 	"type": "package",
 	"handle": "pepa-on-solana-bot",
-	"version": "1.0.1",
+	"version": "pepa-on-solana-1.01",
 	"description": "A character whose personality you can customize dynamically.",
 	"author": "Steamship",
 	"entrypoint": "Unused",
