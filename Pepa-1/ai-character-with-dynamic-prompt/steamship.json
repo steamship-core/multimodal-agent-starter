@@ -1,6 +1,6 @@
 {
 	"type": "package",
-	"handle": "ai-character-with-dynamic-prompt",
+	"handle": "pepa-on-solana-bot",
 	"version": "1.0.1",
 	"description": "A character whose personality you can customize dynamically.",
 	"author": "Steamship",
