@@ -16,7 +16,7 @@
 	"configTemplate": {
 		"telegram_bot_token": {
 			"type": "string",
-			"description": "6791837133:AAFXeYp76AJafom_i2Fkr4Ejg2m7y_-C_sw",
+			"description": "[Optional] Secret token for connecting to Telegram",
 			"default": ""
 		}
 	},
