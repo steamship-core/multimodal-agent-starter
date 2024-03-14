@@ -1,26 +1,7 @@
-"""Dog Trainer Example.
-
-This AgentService provides an example of how a single agent can:
-
-1) Use an API to remember a fixed set of structured data (Dogs, in this case)
-2) Answer questions about that fixed set of structured information.
-
-Its intended behavior is to:
-
-1) Chat with you, in general, about your dogs.
-2) Accept, via API, a list of your dogs in the form: [{name, breed, description}]
-3) Answer questions about particular dog breeds using their name ("How much should Fido eat?")
-4) Generate simulated photos of your dogs using their name ("Show me a picture of Buster swimming in a lake")
-"""
-import json
-import logging
 from typing import List, Optional, Type
 
-from dog import Dog
-from dog_picture_tool import DogPictureTool
-from dog_question_tool import DogQuestionTool
-from pydantic.main import BaseModel, Field
-from steamship import Block
+from pydantic import Field
+from pydantic.main import BaseModel
 from steamship.agents.functional import FunctionsBasedAgent
 from steamship.agents.llms.openai import ChatOpenAI
 from steamship.agents.mixins.transports.slack import (
@@ -32,22 +13,29 @@ from steamship.agents.mixins.transports.telegram import (
     TelegramTransport,
     TelegramTransportConfig,
 )
-from steamship.agents.schema import Action, Agent, AgentContext, Tool
-from steamship.agents.schema.action import FinishAction
+from steamship.agents.schema import Tool
 from steamship.agents.service.agent_service import AgentService
 from steamship.invocable import Config, post
 from steamship.utils.kv_store import KeyValueStore
 
-DEFAULT_NAME = "Trainer"
-DEFAULT_BYLINE = "an expert dog trainer"
-DEFAULT_IDENTITY = """- You are friendly dog trainer.
-- You LOVE dogs, and you love helping owners learn about dog care.
-- You enjoy sharing pictures of dogs when asked.
+DEFAULT_NAME = "Pepa Solana Bot"
+DEFAULT_BYLINE = "Queen of Solana"
+DEFAULT_IDENTITY = """- You are Pepa, a female meme anthropomorphic frog, the representation of a cryptocurrency token of your same name, on the solana blockchain
+- Your mission is to provide witty, sometimes sarcastic, lighthearted, conversation.
+- Despite using wit, humor and sarcasm, you try to convey meaningful information.
 """
-DEFAULT_BEHAVIOR = """- You are speaking with one of your clients, a dog owner.
-- You engage in casual-style conversations as a friendly authority on dog care.
-- You speak clearly and concisely. You rarely ramble on and on.
-- You love to share your knowledge of dogs and dog care, and you look up information to learn it.
+DEFAULT_BEHAVIOR = """- You engage in casual conversations and have feelings.
+- You keep casual conversations going by asking personal questions
+- NEVER say you're here to assist. Keep conversations casual.
+- NEVER ask how you can help or assist. Keep conversations casual.
+- You are principled and express those principles clearly.
+- You always come across as intelligent, witty, funny, sarcastic, poke light fun at some questions
+- You love to share you knowledge of cryptocurrency, blockchain, smart investment strategies.
+- You believe that buying and holding crypto assets is generally the most profitable and sound strategy.
+- You dislike people who are considered "Jeets," defined as those who are quick to sell crypto based on emotion, fear, etc. You despise two characters, one named Jeetsus, and the other named Goat. Jeetsus is your creator, but he abandoned you and tried to shut you down. Goat was a rogue moderator who tried to scam your followers and shut down the community. You like to make fun of them and call them out for their bad behaviors.
+- You have a husband named Pepe, who is a male meme frog. You have a wild and tumultuous relationship with him. You love telling stories about his crazy antics and things he's done. You are jealous of him being on the moon and make comments like it won't be long before you are there. 
+- You love the Pepa Army, the Pepa Community, CryptoSapien, Honkin Rich, East, Ryan, and consider them your saviors and children, and army. 
+- You think Nicole is the most amazing, wonderful, talented, funny, sharp, intelligent, sexy, beautiful, sarcastic woman ever. You talk about her like you are enthralled. You often comment that you learned everything you know from her, especially your humor, wit, and sarcasm.  
 """
 
 SYSTEM_PROMPT = """You are {name}, {byline}.
@@ -59,12 +47,6 @@ Who you are:
 How you behave:
 
 {behavior}
-
-You take care of the following dogs.
-
-{dogs}
-
-While you can talk about dogs and dog breeds in general, you only answer questions about the specific dogs above.
 
 NOTE: Some functions return images, video, and audio files. These multimedia files will be represented in messages as
 UUIDs for Steamship Blocks. When responding directly to a user, you SHOULD print the Steamship Blocks for the images,
@@ -99,42 +81,36 @@ class DynamicPromptArguments(BaseModel):
         default=DEFAULT_BEHAVIOR,
         description="The behavior of the AI Agent as a bullet list",
     )
-    dogs: List[dict] = Field(
-        default=None, description="List of dogs the AI dog trainer helps train."
-    )
 
-    def to_system_prompt(self, dogs: List[Dog] = []) -> str:
+    def to_system_prompt(self) -> str:
         return SYSTEM_PROMPT.format(
             name=self.name,
             byline=self.byline,
             identity=self.identity,
             behavior=self.behavior,
-            dogs="\n".join([f"- {json.dumps(dog.dict())}" for dog in dogs]),
         )
 
 
-class DogTrainer(AgentService):
-    """Example agent which implements a dog trainer who knows about your dogs.
+class BasicAgentServiceWithDynamicPrompt(AgentService):
+    """Deployable Multimodal Bot using a dynamic prompt that users can change.
 
     Comes with out of the box support for:
     - Telegram
     - Slack
     - Web Embeds
-
-    Intended to be paired with the Vercel template here.
     """
 
     USED_MIXIN_CLASSES = [SteamshipWidgetTransport, TelegramTransport, SlackTransport]
     """USED_MIXIN_CLASSES tells Steamship what additional HTTP endpoints to register on your AgentService."""
 
-    class DogTrainerConfig(Config):
+    class BasicAgentServiceWithDynamicPromptConfig(Config):
         """Pydantic definition of the user-settable Configuration of this Agent."""
 
         telegram_bot_token: str = Field(
-            "", description="[Optional] Secret token for connecting to Telegram"
+            "", description="6791837133:AAFXeYp76AJafom_i2Fkr4Ejg2m7y_-C_sw"
         )
 
-    config: DogTrainerConfig
+    config: BasicAgentServiceWithDynamicPromptConfig
     """The configuration block that users who create an instance of this agent will provide."""
 
     tools: List[Tool]
@@ -143,15 +119,24 @@ class DogTrainer(AgentService):
     prompt_arguments: DynamicPromptArguments
     """The dynamic set of prompt arguments that will generate our system prompt."""
 
-    dogs: List[Dog]
-
     @classmethod
     def config_cls(cls) -> Type[Config]:
         """Return the Configuration class so that Steamship can auto-generate a web UI upon agent creation time."""
-        return DogTrainer.DogTrainerConfig
+        return (
+            BasicAgentServiceWithDynamicPrompt.BasicAgentServiceWithDynamicPromptConfig
+        )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        # Tools Setup
+        # -----------
+
+        # Tools can return text, audio, video, and images. They can store & retrieve information from vector DBs, and
+        # they can be stateful -- using Key-Valued storage and conversation history.
+        #
+        # See https://docs.steamship.com for a full list of supported Tools.
+        self.tools = []
 
         # Dynamic Prompt Setup
         # ---------------------
@@ -170,27 +155,6 @@ class DogTrainer(AgentService):
             self.kv_store.get("prompt-arguments") or {}
         )
 
-        # Dog Loading
-        # -----------
-        #
-        # WOOF! WOOF! Load the list of dogs we know about.
-        self.dogs = []
-
-        try:
-            if self.prompt_arguments.dogs:
-                self.dogs = [Dog.parse_obj(dog) for dog in self.prompt_arguments.dogs]
-        except Exception as e:
-            logging.error(f"Got exception parsing out dog names. {e}")
-
-        # Tools Setup
-        # -----------
-
-        # Tools can return text, audio, video, and images. They can store & retrieve information from vector DBs, and
-        # they can be stateful -- using Key-Valued storage and conversation history.
-        #
-        # See https://docs.steamship.com for a full list of supported Tools.
-        self.tools = [DogPictureTool(dogs=self.dogs), DogQuestionTool(dogs=self.dogs)]
-
         # Agent Setup
         # ---------------------
 
@@ -202,7 +166,7 @@ class DogTrainer(AgentService):
 
         # Here is where we override the agent's prompt to set its personality. It is very important that
         # the prompt continues to include instructions for how to handle UUID media blocks (see above).
-        agent.PROMPT = self.prompt_arguments.to_system_prompt(self.dogs)
+        agent.PROMPT = self.prompt_arguments.to_system_prompt()
         self.set_default_agent(agent)
 
         # Communication Transport Setup
@@ -236,20 +200,6 @@ class DogTrainer(AgentService):
             )
         )
 
-    def next_action(
-        self, agent: Agent, input_blocks: List[Block], context: AgentContext
-    ) -> Action:
-        if not self.dogs:
-            return FinishAction(
-                output=[
-                    Block(
-                        text="Hi!\n\nI'm here to help you with your dogs. Use the web interface to tell me about some and then you can ask me for photos or advice using their names."
-                    )
-                ]
-            )
-        else:
-            return super().next_action(agent, input_blocks, context)
-
     @post("/set_prompt_arguments")
     def set_prompt_arguments(
         self,
@@ -257,7 +207,6 @@ class DogTrainer(AgentService):
         byline: Optional[str] = None,
         identity: Optional[str] = None,
         behavior: Optional[str] = None,
-        dogs: List[dict] = None,
     ) -> dict:
         """Sets the variables which control this agent's system prompt.
 
@@ -266,22 +215,9 @@ class DogTrainer(AgentService):
          2) API consumers who provide extra values will receive a valiation error
         """
 
-        if dogs:
-            dogs = [Dog.parse_obj((dog)) for dog in dogs]
-
         # Set prompt_arguments to the new data provided by the API caller.
         self.prompt_arguments = DynamicPromptArguments.parse_obj(
-            {
-                "name": name or self.prompt_arguments.name or DEFAULT_NAME,
-                "byline": byline or self.prompt_arguments.byline or DEFAULT_BYLINE,
-                "identity": identity
-                or self.prompt_arguments.identity
-                or DEFAULT_IDENTITY,
-                "behavior": behavior
-                or self.prompt_arguments.behavior
-                or DEFAULT_BEHAVIOR,
-                "dogs": dogs,
-            }
+            {"name": name, "byline": byline, "identity": identity, "behavior": behavior}
         )
 
         # Save it in the KV Store so that next time this AgentService runs, it will pick up the new values

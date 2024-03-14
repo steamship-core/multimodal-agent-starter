@@ -1,9 +1,9 @@
 {
 	"type": "package",
-	"handle": "ai-character-with-voice",
-	"version": "1.0.2",
-	"description": "A character whose personality you can customize. Responds with voice and can generate Stable Diffusion images.",
-	"author": "",
+	"handle": "pepa-on-solana-bot",
+	"version": "pepa-solana-bot-1.02",
+	"description": "A character whose personality you can customize dynamically.",
+	"author": "Steamship",
 	"entrypoint": "Unused",
 	"public": true,
 	"plugin": null,
@@ -18,11 +18,6 @@
 			"type": "string",
 			"description": "[Optional] Secret token for connecting to Telegram",
 			"default": ""
-		},
-		"eleven_labs_voice_id": {
-			"type": "string",
-			"description": "[Optional] ElevenLabs voice ID (default: Adam)",
-			"default": "pNInz6obpgDQGcFmaJgB"
 		}
 	},
 	"steamshipRegistry": {
